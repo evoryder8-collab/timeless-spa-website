@@ -1,0 +1,27 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "timeless-spa",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "astro",
+        "dev",
+        "--port",
+        "4337"
+      ],
+      "port": 4337
+    },
+    {
+      "name": "timeless-spa-build",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "astro",
+        "preview",
+        "--port",
+        "4338"
+      ],
+      "port": 4338
+    }
+  ]
+}

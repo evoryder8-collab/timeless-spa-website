@@ -1,0 +1,74 @@
+---
+// First visit per session: a breathing circle, then the visitor chooses whether to enter with sound.
+// Shown only when the inline script in Base.astro adds `show-intro` to <html>.
+import Logo from './Logo.astro';
+import { ui } from '../i18n/ui';
+import type { Lang } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang].intro;
+---
+<div class="intro" data-intro role="dialog" aria-modal="true" aria-label="Timeless Spa" transition:animate="none">
+  <div class="intro__glow" data-intro-glow aria-hidden="true"></div>
+  <div class="intro__inner">
+    <Logo class="intro__logo" />
+    <div class="intro__breath" aria-hidden="true">
+      <span class="intro__circle" data-intro-circle></span>
+      <span class="intro__word" data-intro-word data-inhale={t.inhale} data-exhale={t.exhale}>{t.inhale}</span>
+    </div>
+    <div class="intro__choices">
+      <button class="btn" type="button" data-intro-enter="sound">{t.withSound}</button>
+      <button class="btn btn--ghost" type="button" data-intro-enter="silent">{t.withoutSound}</button>
+    </div>
+    <p class="intro__hint">{t.hint}</p>
+  </div>
+</div>
+
+<style>
+  .intro { display: none; }
+  :global(html.show-intro) .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: grid;
+    place-items: center;
+    background: var(--sand);
+    overflow: hidden;
+  }
+  .intro__glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 140vmax;
+    height: 140vmax;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(217 164 127 / 0.55) 0%, rgb(217 164 127 / 0.18) 30%, transparent 60%);
+    transform: translate(-50%, -50%) scale(0.6);
+    pointer-events: none;
+  }
+  .intro__inner { position: relative; display: grid; justify-items: center; gap: 34px; padding: 24px; text-align: center; }
+  .intro__breath { position: relative; display: grid; place-items: center; width: 220px; height: 220px; }
+  .intro__circle {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #e8b896, var(--clay) 62%, var(--clay-deep));
+    box-shadow: 0 0 80px 10px rgb(181 112 79 / 0.35), inset 0 -10px 30px rgb(42 33 27 / 0.25);
+    transform: scale(0.62);
+    animation: breathe 8s ease-in-out infinite;
+  }
+  .intro__word {
+    position: relative;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.35rem;
+    color: var(--linen);
+    letter-spacing: 0.01em;
+  }
+  @keyframes breathe { 0%, 100% { transform: scale(0.62); } 50% { transform: scale(1); } }
+  .intro__choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .intro__hint { margin: -16px 0 0; color: var(--muted); font-size: 0.9rem; }
+  .intro :global(.logo__text) { font-size: 1.9rem; }
+  .intro :global(.logo__mark) { width: 42px; height: 42px; }
+</style>

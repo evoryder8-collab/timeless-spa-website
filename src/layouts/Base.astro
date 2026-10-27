@@ -1,0 +1,75 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import BookingSheet from '../components/BookingSheet.astro';
+import Intro from '../components/Intro.astro';
+import { href, type PageKey } from '../i18n/routes';
+import { site, type Lang } from '../data/site';
+import { linen } from '../scripts/transitions';
+
+interface Props { lang: Lang; page: PageKey; title: string; description: string }
+const { lang, page, title, description } = Astro.props;
+const fullTitle = page === 'home' ? title : `${title} · ${site.name}`;
+const abs = (path: string) => (Astro.site ? new URL(path, Astro.site).href : path);
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+<!doctype html>
+<html lang={lang} transition:animate="none">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ede4d8" />
+    <!-- review build: keep search engines out until the site launches -->
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    {Astro.site && <link rel="canonical" href={abs(href(page, lang))} />}
+    <link rel="alternate" hreflang="de" href={abs(href(page, 'de'))} />
+    <link rel="alternate" hreflang="en" href={abs(href(page, 'en'))} />
+    <link rel="alternate" hreflang="x-default" href={abs(href(page, 'de'))} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content={lang === 'de' ? 'de_DE' : 'en_GB'} />
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) d.classList.add('reduced');
+        try {
+          if (!reduced && !sessionStorage.getItem('ts-intro')) d.classList.add('show-intro');
+        } catch (e) {}
+      })();
+    </script>
+    <ClientRouter />
+  </head>
+  <body data-page={page}>
+    <Header lang={lang} page={page} />
+    <Intro lang={lang} />
+    <div class="page" transition:animate={linen}>
+      <main id="main">
+        <slot />
+      </main>
+      <Footer lang={lang} />
+    </div>
+    <BookingSheet lang={lang} />
+    <div class="stone-layer" data-stone-layer transition:persist="stone-layer" aria-hidden="true"></div>
+    <script>
+      import '../scripts/app';
+    </script>
+  </body>
+</html>
+
+<style>
+  .stone-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    pointer-events: none;
+  }
+</style>

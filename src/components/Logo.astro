@@ -1,0 +1,38 @@
+---
+// Wordmark: three balanced stones (the cairn from the home page) and "Timeless Spa".
+interface Props { class?: string }
+const { class: cls } = Astro.props;
+---
+<span class:list={['logo', cls]}>
+  <svg class="logo__mark" viewBox="0 0 40 40" aria-hidden="true">
+    <ellipse cx="20" cy="31.5" rx="14" ry="6" fill="currentColor" />
+    <ellipse cx="19" cy="21.2" rx="10" ry="4.6" fill="currentColor" transform="rotate(-6 19 21.2)" />
+    <ellipse cx="20.5" cy="12.6" rx="6.4" ry="3.6" fill="var(--logo-accent, var(--clay))" transform="rotate(5 20.5 12.6)" />
+  </svg>
+  <span class="logo__text">Timeless<span class="logo__spa">Spa</span></span>
+</span>
+
+<style>
+  .logo { display: inline-flex; align-items: center; gap: 10px; color: var(--espresso); }
+  .logo__mark { width: 34px; height: 34px; flex: none; }
+  .logo__text {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 420;
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 72;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .logo__spa {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--clay-deep);
+    transform: translateY(-2px);
+  }
+</style>

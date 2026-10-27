@@ -1,0 +1,88 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { ui } from '../i18n/ui';
+import { euro, focusLabels, type Massage } from '../data/massages';
+import type { Lang } from '../data/site';
+
+interface Props { m: Massage; lang: Lang }
+const { m, lang } = Astro.props;
+const t = ui[lang];
+const twoNote = lang === 'de' ? 'Preis für zwei Personen' : 'Price for two people';
+---
+<article class:list={['mcard', { 'mcard--photo': m.photo }]} data-massage data-focus={m.focus.join(' ')} data-warm={m.warm ? '' : undefined} data-stone-hover>
+  {m.photo && (
+    <div class="mcard__photo">
+      <Image src={m.photo} alt="" widths={[360, 640]} sizes="(max-width: 700px) 100vw, 320px" />
+    </div>
+  )}
+  <div class="mcard__body">
+    <div class="mcard__tags">
+      {m.focus.map((f) => <span>{focusLabels[f][lang]}</span>)}
+      {m.warm && <span class="mcard__warm"><Icon name="flame" />{lang === 'de' ? 'Wärme' : 'Warmth'}</span>}
+    </div>
+    <h3>{m.name[lang]}</h3>
+    <p>{m.text[lang]}</p>
+    <ul class="mcard__prices" aria-label={lang === 'de' ? 'Dauer und Preis' : 'Duration and price'}>
+      {m.options.map((o) => (
+        <li><span>{o.minutes} {t.minutes}</span><strong>{euro(o.price, lang)}</strong></li>
+      ))}
+    </ul>
+    {m.forTwo && <p class="mcard__note"><Icon name="users" />{twoNote}</p>}
+  </div>
+</article>
+
+<style>
+  .mcard {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    border-radius: var(--radius);
+    background: var(--linen);
+    box-shadow: 0 1px 0 var(--line);
+    overflow: hidden;
+    transition: transform 0.7s var(--ease), box-shadow 0.7s var(--ease), background-color 0.6s;
+  }
+  .mcard--photo { grid-template-columns: minmax(180px, 0.8fr) 1.6fr; }
+  .mcard:hover { transform: translateY(-4px); box-shadow: 0 30px 60px -36px rgb(42 33 27 / 0.45); }
+  .mcard[data-warm]:hover { background: #f7ece3; }
+  .mcard.is-hidden { display: none; }
+  .mcard__photo { position: relative; overflow: hidden; min-height: 220px; }
+  .mcard__photo :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
+  .mcard:hover .mcard__photo :global(img) { transform: scale(1.05); }
+  .mcard__body { padding: clamp(24px, 3vw, 34px); display: flex; flex-direction: column; }
+  .mcard h3 { margin: 12px 0 10px; }
+  .mcard__body > p { color: var(--muted); }
+  .mcard__tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .mcard__tags span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--sand);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .mcard__tags .mcard__warm { background: rgb(181 112 79 / 0.14); color: var(--clay-deep); }
+  .mcard__warm :global(svg) { width: 13px; height: 13px; }
+  .mcard__prices { display: flex; flex-wrap: wrap; gap: 8px; margin: auto 0 0; padding: 8px 0 0; list-style: none; }
+  .mcard__prices li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-variant-numeric: tabular-nums;
+  }
+  .mcard__prices span { color: var(--muted); font-size: 0.9rem; }
+  .mcard__prices strong { font-family: var(--serif); font-size: 1.2rem; font-weight: 450; }
+  .mcard__note { display: flex; align-items: center; gap: 8px; margin: 14px 0 0; font-size: 0.88rem; color: var(--muted); }
+  .mcard__note :global(svg) { width: 16px; height: 16px; }
+  @media (max-width: 700px) {
+    .mcard--photo { grid-template-columns: 1fr; }
+    .mcard__photo { min-height: 0; aspect-ratio: 16 / 9; }
+  }
+</style>

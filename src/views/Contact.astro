@@ -1,0 +1,109 @@
+---
+import Base from '../layouts/Base.astro';
+import Hours from '../components/Hours.astro';
+import MapBlock from '../components/MapBlock.astro';
+import Icon from '../components/Icon.astro';
+import { ui } from '../i18n/ui';
+import { site, mailto, whatsappWith, type Lang } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+
+const copy = {
+  de: {
+    title: 'Kontakt & Öffnungszeiten',
+    description: 'Timeless Spa, Melatengürtel 131A, 50825 Köln-Ehrenfeld. Öffnungszeiten, Anfahrt und Termin per Telefon, WhatsApp oder E-Mail.',
+    eyebrow: 'Kontakt',
+    h1: 'Wir freuen uns <em>auf Sie</em>.',
+    lead: 'Für Termine, Fragen und Gutscheine erreichen Sie uns am schnellsten per Telefon oder WhatsApp.',
+    reach: 'So erreichen Sie uns',
+  },
+  en: {
+    title: 'Contact & Opening hours',
+    description: 'Timeless Spa, Melatengürtel 131A, 50825 Cologne-Ehrenfeld. Opening hours, directions and bookings by phone, WhatsApp or email.',
+    eyebrow: 'Contact',
+    h1: 'We look forward <em>to seeing you</em>.',
+    lead: 'For appointments, questions and gift vouchers, the quickest way to reach us is by phone or WhatsApp.',
+    reach: 'How to reach us',
+  },
+}[lang];
+---
+<Base lang={lang} page="contact" title={copy.title} description={copy.description}>
+  <section class="page-hero chero">
+    <div class="wrap">
+      <p class="eyebrow" data-reveal="rise">{copy.eyebrow}</p>
+      <h1 data-reveal="words" set:html={copy.h1} />
+      <p class="lead" data-reveal="rise">{copy.lead}</p>
+    </div>
+  </section>
+
+  <section class="section section--tight contact">
+    <div class="wrap contact__grid">
+      <div class="contact__info">
+        <div data-reveal="rise">
+          <h2 class="contact__label">{copy.reach}</h2>
+          <div class="contact__options">
+            <a class="contact__option" href={site.phone.href} data-sfx="bowl"><Icon name="phone" /><span><strong>{t.booking.call}</strong>{site.phone.display}</span></a>
+            <a class="contact__option" href={whatsappWith(t.booking.whatsappText)} target="_blank" rel="noopener" data-sfx="bowl"><Icon name="whatsapp" /><span><strong>WhatsApp</strong>{site.whatsapp.display}</span></a>
+            <a class="contact__option" href={mailto(t.booking.emailSubject)} data-sfx="bowl"><Icon name="mail" /><span><strong>{t.booking.email}</strong>{site.email}</span></a>
+          </div>
+        </div>
+        <div data-reveal="rise">
+          <h2 class="contact__label">{t.address}</h2>
+          <address class="contact__address">
+            {site.name}<br />
+            {site.address.street}<br />
+            {site.address.zip} {site.address.city}-{site.address.district}
+          </address>
+        </div>
+        <div data-reveal="rise">
+          <h2 class="contact__label">{t.hours}</h2>
+          <Hours lang={lang} />
+        </div>
+      </div>
+      <div class="contact__map" data-reveal="rise">
+        <MapBlock lang={lang} />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .chero { padding-bottom: clamp(30px, 4vw, 50px); }
+  .chero .lead { margin-top: 28px; }
+  .contact { padding-top: 0; }
+  .contact__grid { display: grid; grid-template-columns: 0.85fr 1.3fr; gap: clamp(32px, 5vw, 70px); align-items: stretch; }
+  .contact__info { display: grid; gap: 44px; align-content: start; }
+  .contact__label {
+    margin-bottom: 16px;
+    font-family: var(--sans);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--olive-deep);
+  }
+  .contact__options { display: grid; gap: 10px; }
+  .contact__option {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: var(--linen);
+    text-decoration: none;
+    transition: transform 0.5s var(--ease), background-color 0.3s;
+  }
+  .contact__option:hover { transform: translateX(5px); background: #fbf7f1; }
+  .contact__option :global(svg) { width: 22px; height: 22px; flex: none; color: var(--clay-deep); }
+  .contact__option strong { display: block; }
+  .contact__option span { color: var(--muted); font-size: 0.95rem; overflow-wrap: anywhere; }
+  .contact__option strong { color: var(--ink); }
+  .contact__address { font-style: normal; font-size: 1.15rem; line-height: 1.6; }
+  .contact__map { min-height: 560px; }
+  @media (max-width: 900px) {
+    .contact__grid { grid-template-columns: 1fr; }
+    .contact__map { min-height: 460px; }
+  }
+</style>

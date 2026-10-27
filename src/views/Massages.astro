@@ -1,0 +1,108 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import MassageCard from '../components/MassageCard.astro';
+import Icon from '../components/Icon.astro';
+import { ui } from '../i18n/ui';
+import { massages, focusLabels, menuIsSample, type Focus } from '../data/massages';
+import type { Lang } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+
+const copy = {
+  de: {
+    title: 'Massagen & Preise',
+    description: 'Alle Massagen von Timeless Spa in Köln-Ehrenfeld mit Dauer und Preisen: klassisch, Hot Stone, Aromaöl, Tiefengewebe, Thai, Kräuterstempel und Paarmassage.',
+    eyebrow: 'Massagen & Preise',
+    h1: 'Finden Sie Ihre <em>Massage</em>.',
+    lead: 'Jede Massage beginnt mit einem kurzen Gespräch, damit Druck, Öl und Schwerpunkt zu Ihnen passen. Nicht sicher, was Sie wählen sollen? Fragen Sie uns einfach bei der Buchung.',
+    filter: 'Nach Wirkung filtern',
+    sample: 'Beispielmenü: Massagen und Preise werden durch das echte Angebot ersetzt.',
+    vat: 'Alle Preise inkl. gesetzlicher MwSt.',
+    unsureTitle: 'Noch unentschlossen?',
+    unsureText: 'Erzählen Sie uns, was Sie brauchen, und wir empfehlen Ihnen die passende Massage.',
+  },
+  en: {
+    title: 'Massages & Prices',
+    description: 'All massages at Timeless Spa in Cologne-Ehrenfeld with durations and prices: classic, hot stone, aromatherapy, deep tissue, Thai, herbal compress and couples massage.',
+    eyebrow: 'Massages & Prices',
+    h1: 'Find your <em>massage</em>.',
+    lead: 'Every massage starts with a short chat so the pressure, oil and focus suit you. Not sure what to choose? Just ask us when you book.',
+    filter: 'Filter by effect',
+    sample: 'Sample menu: these massages and prices will be replaced with the real menu.',
+    vat: 'All prices include VAT.',
+    unsureTitle: 'Still deciding?',
+    unsureText: 'Tell us what you need and we will recommend the right massage.',
+  },
+}[lang];
+
+const filters: (Focus | 'all')[] = ['all', 'relax', 'deep', 'couples'];
+---
+<Base lang={lang} page="massages" title={copy.title} description={copy.description}>
+  <PageHero eyebrow={copy.eyebrow} title={copy.h1} lead={copy.lead} />
+
+  <section class="section section--tight menu">
+    <div class="wrap">
+      {menuIsSample && <p class="menu__sample" role="note">{copy.sample}</p>}
+      <div class="menu__filters" role="group" aria-label={copy.filter} data-filters data-reveal="rise">
+        {filters.map((f) => (
+          <button type="button" class="chip" data-filter={f} aria-pressed={f === 'all' ? 'true' : 'false'}>{focusLabels[f][lang]}</button>
+        ))}
+      </div>
+      <div class="menu__list" data-reveal="stagger" data-menu-list data-stone-spot="top-right">
+        {massages.map((m) => (
+          <div id={m.id} class="menu__item" data-reveal-item>
+            <MassageCard m={m} lang={lang} />
+          </div>
+        ))}
+      </div>
+      <p class="menu__vat">{copy.vat}</p>
+    </div>
+  </section>
+
+  <section class="section section--dark unsure">
+    <div class="wrap unsure__inner">
+      <h2 data-reveal="words">{copy.unsureTitle}</h2>
+      <p class="lead" data-reveal="rise">{copy.unsureText}</p>
+      <div data-reveal="rise">
+        <button class="btn btn--light" type="button" data-book data-sfx="bowl"><Icon name="phone" />{t.book}</button>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .menu { padding-top: 0; }
+  .menu__sample {
+    margin: 0 0 28px;
+    padding: 12px 18px;
+    border: 1px dashed var(--clay);
+    border-radius: 14px;
+    color: var(--clay-deep);
+    font-size: 0.92rem;
+  }
+  .menu__filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
+  .chip {
+    min-height: 44px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.4s var(--ease), color 0.4s var(--ease), box-shadow 0.4s;
+  }
+  .chip:hover { background: var(--sand-2); }
+  .chip[aria-pressed='true'] { background: var(--espresso); color: var(--sand); box-shadow: none; }
+  .menu__list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .menu__item.is-hidden { display: none; }
+  .menu__item { scroll-margin-top: calc(var(--header-h) + 24px); }
+  .menu__vat { margin: 28px 0 0; color: var(--muted); font-size: 0.9rem; }
+  .unsure__inner { display: grid; justify-items: center; text-align: center; }
+  .unsure .lead { margin: 20px 0 30px; }
+  @media (max-width: 1100px) { .menu__list { grid-template-columns: 1fr; } }
+</style>

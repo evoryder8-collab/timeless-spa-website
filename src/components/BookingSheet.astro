@@ -1,0 +1,131 @@
+---
+import Icon from './Icon.astro';
+import Hours from './Hours.astro';
+import { ui } from '../i18n/ui';
+import { site, fullAddress, mailto, whatsappWith, type Lang } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+<dialog class="booking" id="booking" aria-labelledby="booking-title" data-booking transition:animate="none">
+  <div class="booking__card">
+    <button class="booking__close" type="button" data-booking-close aria-label={t.close}><Icon name="close" /></button>
+    <p class="eyebrow">Timeless Spa</p>
+    <h2 id="booking-title">{t.booking.title}</h2>
+    <p class="booking__lead">{t.booking.lead}</p>
+
+    <div class="booking__options">
+      <a class="booking__option" href={site.phone.href} data-sfx="bowl">
+        <span class="booking__icon"><Icon name="phone" /></span>
+        <span><strong>{t.booking.call}</strong><small>{site.phone.display}</small></span>
+      </a>
+      <a class="booking__option" href={whatsappWith(t.booking.whatsappText)} target="_blank" rel="noopener" data-sfx="bowl">
+        <span class="booking__icon"><Icon name="whatsapp" /></span>
+        <span><strong>{t.booking.whatsapp}</strong><small>{site.whatsapp.display}</small></span>
+      </a>
+      <a class="booking__option" href={mailto(t.booking.emailSubject)} data-sfx="bowl">
+        <span class="booking__icon"><Icon name="mail" /></span>
+        <span><strong>{t.booking.email}</strong><small>{site.email}</small></span>
+      </a>
+    </div>
+
+    <div class="booking__meta">
+      <div>
+        <h3 class="booking__label">{t.hours}</h3>
+        <Hours lang={lang} compact />
+      </div>
+      <div>
+        <h3 class="booking__label">{t.address}</h3>
+        <p>{fullAddress}</p>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .booking {
+    width: min(560px, calc(100% - 24px));
+    max-height: calc(100dvh - 24px);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 28px;
+    background: var(--linen);
+    color: var(--ink);
+    box-shadow: 0 40px 120px -30px rgb(42 33 27 / 0.6);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .booking::backdrop { background: rgb(42 33 27 / 0.45); backdrop-filter: blur(6px); }
+  .booking[open] { animation: booking-in 0.6s var(--ease) both; }
+  .booking[open]::backdrop { animation: fade 0.5s both; }
+  @keyframes booking-in { from { opacity: 0; transform: translateY(30px) scale(0.97); } }
+  @keyframes fade { from { opacity: 0; } }
+
+  .booking__card { position: relative; padding: clamp(28px, 5vw, 44px); }
+  .booking__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--sand);
+    cursor: pointer;
+  }
+  .booking__close :global(svg) { width: 18px; height: 18px; }
+  .booking h2 { font-size: clamp(2rem, 5vw, 2.6rem); }
+  .booking__lead { margin: 14px 0 26px; color: var(--muted); }
+
+  .booking__options { display: grid; gap: 10px; }
+  .booking__option {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: var(--sand);
+    text-decoration: none;
+    transition: background-color 0.35s, transform 0.5s var(--ease);
+  }
+  .booking__option:hover { background: var(--sand-2); transform: translateX(4px); }
+  .booking__option strong { display: block; font-size: 1.05rem; }
+  .booking__option small { display: block; color: var(--muted); font-size: 0.9rem; }
+  .booking__icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--clay-deep);
+    color: var(--linen);
+  }
+  .booking__icon :global(svg) { width: 20px; height: 20px; }
+
+  .booking__meta {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 24px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 0.93rem;
+  }
+  .booking__meta p { margin: 0; }
+  .booking__label {
+    margin-bottom: 8px;
+    font-family: var(--sans);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--olive-deep);
+  }
+  @media (max-width: 520px) { .booking__meta { grid-template-columns: 1fr; } }
+</style>

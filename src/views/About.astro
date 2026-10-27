@@ -1,0 +1,170 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { ui } from '../i18n/ui';
+import type { Lang } from '../data/site';
+import heroPhoto from '../assets/photos/spa-room.jpg';
+import oil from '../assets/photos/amber-oil-bottle.jpg';
+import candles from '../assets/photos/candles.jpg';
+import towels from '../assets/photos/towels-candles.jpg';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+
+// PLACEHOLDER: the story and the team are draft copy until Timeless Spa provides the real details.
+const copy = {
+  de: {
+    title: 'Über uns',
+    description: 'Timeless Spa in Köln-Ehrenfeld: ein ruhiger Ort für Massagen, an dem Zeit keine Rolle spielt.',
+    eyebrow: 'Über uns',
+    h1: 'Ein Ort, an dem <em>niemand drängt</em>.',
+    lead: 'Timeless Spa ist aus einer einfachen Idee entstanden: Eine gute Massage braucht Zeit, Ruhe und Hände, die zuhören.',
+    photoAlt: 'Behandlungsraum mit Massageliege in warmem Licht',
+    valuesEyebrow: 'Was uns wichtig ist',
+    valuesTitle: 'Drei Dinge, die Sie <em>spüren</em> werden.',
+    values: [
+      ['hourglass', 'Zeit', 'Wir planen Termine mit Luft dazwischen. So beginnt Ihre Massage pünktlich und endet nicht mit einem Blick auf die Uhr.'],
+      ['hands', 'Handwerk', 'Jede Massage wird an Sie angepasst: an Ihren Körper, Ihren Tag und an das, was Ihnen guttut.'],
+      ['leaf', 'Ruhe', 'Gedämpftes Licht, warme Tücher, kein Lärm. Ein Raum, in dem der Kopf leiser wird.'],
+    ],
+    spaceEyebrow: 'Der Raum',
+    spaceTitle: 'Warm, schlicht, <em>still</em>.',
+    spaceText: 'Natürliche Farben, weiche Stoffe und warmes Licht. Wir haben den Raum so eingerichtet, dass Sie sich vom ersten Moment an fallen lassen können.',
+    teamEyebrow: 'Das Team',
+    teamTitle: 'Die Hände hinter <em>Timeless</em>.',
+    teamText: 'Hier stellen wir bald unser Team vor.',
+    member: 'Name folgt',
+    role: 'Massagetherapeut:in',
+  },
+  en: {
+    title: 'About us',
+    description: 'Timeless Spa in Cologne-Ehrenfeld: a calm place for massage where time does not matter.',
+    eyebrow: 'About us',
+    h1: 'A place where <em>no one rushes you</em>.',
+    lead: 'Timeless Spa grew out of a simple idea: a good massage needs time, calm and hands that listen.',
+    photoAlt: 'Treatment room with a massage table in warm light',
+    valuesEyebrow: 'What matters to us',
+    valuesTitle: 'Three things you will <em>feel</em>.',
+    values: [
+      ['hourglass', 'Time', 'We plan appointments with space in between, so your massage starts on time and never ends with a glance at the clock.'],
+      ['hands', 'Craft', 'Every massage is shaped around you: your body, your day and what feels good to you.'],
+      ['leaf', 'Calm', 'Soft light, warm towels, no noise. A room where your mind gets quieter.'],
+    ],
+    spaceEyebrow: 'The space',
+    spaceTitle: 'Warm, simple, <em>still</em>.',
+    spaceText: 'Natural colours, soft fabrics and warm light. We set up the room so you can let go from the very first moment.',
+    teamEyebrow: 'The team',
+    teamTitle: 'The hands behind <em>Timeless</em>.',
+    teamText: 'We will introduce our team here soon.',
+    member: 'Name to follow',
+    role: 'Massage therapist',
+  },
+}[lang];
+---
+<Base lang={lang} page="about" title={copy.title} description={copy.description}>
+  <PageHero eyebrow={copy.eyebrow} title={copy.h1} lead={copy.lead} photo={heroPhoto} photoAlt={copy.photoAlt} />
+
+  <section class="section values">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal="rise">{copy.valuesEyebrow}</p>
+        <h2 data-reveal="words" set:html={copy.valuesTitle} />
+      </div>
+      <ul class="values__list" data-reveal="stagger">
+        {copy.values.map(([icon, title, text]) => (
+          <li data-reveal-item>
+            <span class="values__icon"><Icon name={icon as 'leaf'} /></span>
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--linen space">
+    <div class="wrap space__grid">
+      <div class="space__text">
+        <p class="eyebrow" data-reveal="rise">{copy.spaceEyebrow}</p>
+        <h2 data-reveal="words" set:html={copy.spaceTitle} />
+        <p class="lead" data-reveal="rise">{copy.spaceText}</p>
+      </div>
+      <div class="space__photos">
+        <div class="photo space__a" data-reveal="ripple" data-stone-spot="top-right"><Image src={towels} alt="" widths={[480, 900]} sizes="(max-width: 900px) 100vw, 34vw" /></div>
+        <div class="photo space__b" data-reveal="ripple"><Image src={candles} alt="" widths={[400, 700]} sizes="(max-width: 900px) 50vw, 22vw" /></div>
+        <div class="photo space__c" data-reveal="ripple"><Image src={oil} alt="" widths={[400, 700]} sizes="(max-width: 900px) 50vw, 22vw" /></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section team">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal="rise">{copy.teamEyebrow}</p>
+        <h2 data-reveal="words" set:html={copy.teamTitle} />
+        <p class="lead" data-reveal="rise">{copy.teamText}</p>
+      </div>
+      <ul class="team__list" data-reveal="stagger">
+        {[1, 2, 3].map(() => (
+          <li data-reveal-item>
+            <div class="team__portrait" aria-hidden="true">
+              <svg viewBox="0 0 40 40"><ellipse cx="20" cy="30" rx="11" ry="4.8" fill="currentColor" /><ellipse cx="19.4" cy="21.6" rx="8" ry="3.7" fill="currentColor" transform="rotate(-6 19.4 21.6)" /><ellipse cx="20.6" cy="14.6" rx="5.2" ry="3" fill="currentColor" transform="rotate(5 20.6 14.6)" /></svg>
+            </div>
+            <h3>{copy.member}</h3>
+            <p>{copy.role}</p>
+          </li>
+        ))}
+      </ul>
+      <div class="team__cta" data-reveal="rise">
+        <button class="btn" type="button" data-book data-sfx="bowl">{t.book}</button>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .values__list { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 3vw, 40px); margin: 0; padding: 0; list-style: none; }
+  .values__list li { padding: 34px; border-radius: var(--radius); background: var(--linen); }
+  .values__icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    margin-bottom: 28px;
+    border-radius: 50%;
+    background: var(--sand);
+    color: var(--clay-deep);
+  }
+  .values__icon :global(svg) { width: 26px; height: 26px; }
+  .values__list h3 { margin-bottom: 12px; }
+  .values__list p { margin: 0; color: var(--muted); }
+
+  .space__grid { display: grid; grid-template-columns: 0.9fr 1.2fr; gap: clamp(40px, 6vw, 90px); align-items: center; }
+  .space h2 { margin-bottom: 26px; }
+  .space__photos { display: grid; grid-template-columns: 1.3fr 1fr; grid-template-rows: 1fr 1fr; gap: 14px; aspect-ratio: 1.15; }
+  .space__a { grid-row: 1 / 3; }
+
+  .team__list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin: 0; padding: 0; list-style: none; }
+  .team__portrait {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 5;
+    margin-bottom: 18px;
+    border-radius: var(--radius);
+    background: linear-gradient(160deg, var(--sand-2), var(--sand-3));
+    color: rgb(42 33 27 / 0.18);
+  }
+  .team__portrait svg { width: 34%; }
+  .team__list p { color: var(--muted); }
+  .team__cta { display: flex; justify-content: center; margin-top: 40px; }
+
+  @media (max-width: 900px) {
+    .values__list, .team__list { grid-template-columns: 1fr; }
+    .space__grid { grid-template-columns: 1fr; }
+    .team__list { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 520px) { .team__list { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,46 @@
+---
+import { ui } from '../i18n/ui';
+import { site, type Lang } from '../data/site';
+
+interface Props { lang: Lang; compact?: boolean }
+const { lang, compact = false } = Astro.props;
+const t = ui[lang];
+---
+<dl class:list={['hours', { 'hours--compact': compact }]} data-hours>
+  {site.hours.map((row) => (
+    <div class="hours__row" data-days={row.days.join(',')}>
+      <dt>{row.label[lang]}<span class="hours__today">{t.today}</span></dt>
+      <dd>{row.time ?? t.closed}</dd>
+    </div>
+  ))}
+</dl>
+{!compact && <p class="hours__note">{site.hoursNote[lang]}</p>}
+
+<style>
+  .hours { margin: 0; display: grid; }
+  .hours__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .hours--compact .hours__row { padding: 3px 0; border: 0; }
+  .hours dt { display: flex; align-items: center; gap: 10px; }
+  .hours dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .hours__today {
+    display: none;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--olive);
+    color: var(--linen);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .hours--compact .hours__today { display: none !important; }
+  .hours__row.is-today { font-weight: 600; }
+  .hours__row.is-today .hours__today { display: inline-block; }
+  .hours__note { margin: 14px 0 0; color: var(--muted); font-size: 0.93rem; }
+</style>

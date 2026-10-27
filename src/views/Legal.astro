@@ -1,0 +1,118 @@
+---
+// Impressum and Datenschutz (imprint and privacy policy).
+// PLACEHOLDER: structure only. Fill in the operator's details and have both pages checked by a lawyer
+// or a generator such as e-recht24 before publishing.
+import Base from '../layouts/Base.astro';
+import { site, fullAddress, type Lang } from '../data/site';
+
+interface Props { lang: Lang; kind: 'imprint' | 'privacy' }
+const { lang, kind } = Astro.props;
+const de = lang === 'de';
+
+const photographers = ['Massage a Domicile', 'Jakub Klucký', 'Charanjeet Dhiman', 'Taylor Heery', 'Stephen Olmo', 'Kadarius Seegars', 'olga volkovitskaia', 'Sixteen Miles Out', 'Anna Keibalo', 'visualsofdana', 'Charles Chen'];
+
+const title = kind === 'imprint' ? (de ? 'Impressum' : 'Imprint') : (de ? 'Datenschutz' : 'Privacy policy');
+const notice = de
+  ? 'Entwurf: Diese Seite enthält Platzhalter und muss vor der Veröffentlichung vervollständigt und rechtlich geprüft werden.'
+  : 'Draft: this page contains placeholders and must be completed and legally reviewed before the site goes live.';
+---
+<Base lang={lang} page={kind} title={title} description={`${title} · ${site.name}`}>
+  <section class="page-hero legal-hero">
+    <div class="wrap">
+      <p class="eyebrow">{site.name}</p>
+      <h1>{title}</h1>
+    </div>
+  </section>
+
+  <section class="section section--tight legal">
+    <div class="wrap legal__body">
+      <p class="legal__notice" role="note">{notice}</p>
+
+      {kind === 'imprint' && de && (
+        <>
+          <h2>Angaben gemäß § 5 DDG</h2>
+          <p>{site.name}<br />[Name der Inhaberin / des Inhabers oder Firma und Rechtsform]<br />{fullAddress}</p>
+          <h2>Kontakt</h2>
+          <p>Telefon: {site.phone.display}<br />E-Mail: {site.email}</p>
+          <h2>Umsatzsteuer-ID</h2>
+          <p>[Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG, falls vorhanden]</p>
+          <h2>Verantwortlich für den Inhalt</h2>
+          <p>[Name, Anschrift]</p>
+          <h2>Verbraucherstreitbeilegung</h2>
+          <p>[Hinweis, ob Sie bereit oder verpflichtet sind, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen]</p>
+          <h2>Bildnachweise</h2>
+          <p>Fotos von Unsplash: {photographers.join(', ')}.</p>
+        </>
+      )}
+
+      {kind === 'imprint' && !de && (
+        <>
+          <p>The legally binding imprint (Impressum) is the German version. This English page mirrors it for convenience.</p>
+          <h2>Information according to § 5 DDG</h2>
+          <p>{site.name}<br />[Name of the owner or company and legal form]<br />{fullAddress}</p>
+          <h2>Contact</h2>
+          <p>Phone: {site.phone.display}<br />Email: {site.email}</p>
+          <h2>VAT ID</h2>
+          <p>[VAT identification number under § 27a UStG, if any]</p>
+          <h2>Responsible for content</h2>
+          <p>[Name, address]</p>
+          <h2>Consumer dispute resolution</h2>
+          <p>[Statement on whether you take part in dispute resolution before a consumer arbitration board]</p>
+          <h2>Photo credits</h2>
+          <p>Photos from Unsplash: {photographers.join(', ')}.</p>
+        </>
+      )}
+
+      {kind === 'privacy' && de && (
+        <>
+          <h2>1. Verantwortliche Stelle</h2>
+          <p>{site.name}, [Name der Inhaberin / des Inhabers], {fullAddress}, E-Mail: {site.email}</p>
+          <h2>2. Hosting und Server-Logfiles</h2>
+          <p>[Name und Anschrift des Hosting-Anbieters]. Beim Aufruf der Website werden technisch notwendige Daten (z. B. IP-Adresse, Datum und Uhrzeit, aufgerufene Seite, Browser) in Server-Logfiles verarbeitet. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO.</p>
+          <h2>3. Keine Cookies, kein Tracking</h2>
+          <p>Diese Website setzt keine Cookies und verwendet keine Analyse- oder Tracking-Dienste. Schriften werden lokal von unserem Server geladen. Im Sitzungsspeicher Ihres Browsers (sessionStorage) merken wir uns nur, ob Sie die Begrüßung bereits gesehen und ob Sie Klang eingeschaltet haben. Diese Angaben verlassen Ihr Gerät nicht und werden beim Schließen des Browsers gelöscht.</p>
+          <h2>4. Karte (OpenFreeMap)</h2>
+          <p>Auf der Kontaktseite können Sie eine Karte laden. Erst nach Ihrem Klick auf „Karte anzeigen“ werden Kartendaten von OpenFreeMap (tiles.openfreemap.org) abgerufen; dabei wird Ihre IP-Adresse an diesen Dienst übertragen. Rechtsgrundlage: Ihre Einwilligung, Art. 6 Abs. 1 lit. a DSGVO. [Angaben zum Anbieter ergänzen.]</p>
+          <h2>5. Kontakt per Telefon, WhatsApp und E-Mail</h2>
+          <p>Wenn Sie uns kontaktieren, verarbeiten wir Ihre Angaben zur Bearbeitung Ihrer Anfrage (Art. 6 Abs. 1 lit. b DSGVO). Bei Nutzung von WhatsApp gelten zusätzlich die Datenschutzbestimmungen von WhatsApp (Meta). [Ergänzen.]</p>
+          <h2>6. Ihre Rechte</h2>
+          <p>Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch sowie das Recht auf Beschwerde bei einer Aufsichtsbehörde. [Ergänzen.]</p>
+        </>
+      )}
+
+      {kind === 'privacy' && !de && (
+        <>
+          <p>The legally binding privacy policy is the German version. This English page mirrors it for convenience.</p>
+          <h2>1. Controller</h2>
+          <p>{site.name}, [Name of the owner], {fullAddress}, Email: {site.email}</p>
+          <h2>2. Hosting and server log files</h2>
+          <p>[Name and address of the hosting provider]. When you visit the site, technically necessary data (e.g. IP address, date and time, page requested, browser) is processed in server log files. Legal basis: Art. 6(1)(f) GDPR.</p>
+          <h2>3. No cookies, no tracking</h2>
+          <p>This site sets no cookies and uses no analytics or tracking services. Fonts are served from our own server. Your browser’s session storage only remembers whether you have seen the welcome screen and whether you turned sound on. This never leaves your device and is cleared when you close the browser.</p>
+          <h2>4. Map (OpenFreeMap)</h2>
+          <p>On the contact page you can load a map. Only after you click “Show map” is map data fetched from OpenFreeMap (tiles.openfreemap.org), which receives your IP address. Legal basis: your consent, Art. 6(1)(a) GDPR. [Add provider details.]</p>
+          <h2>5. Contact by phone, WhatsApp and email</h2>
+          <p>When you contact us we process your details to handle your request (Art. 6(1)(b) GDPR). If you use WhatsApp, WhatsApp’s (Meta’s) privacy policy also applies. [Complete.]</p>
+          <h2>6. Your rights</h2>
+          <p>You have the right of access, rectification, erasure, restriction of processing, data portability and objection, and the right to lodge a complaint with a supervisory authority. [Complete.]</p>
+        </>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .legal-hero { padding-bottom: 20px; }
+  .legal { padding-top: 20px; }
+  .legal__body { max-width: 760px; }
+  .legal__notice {
+    margin-bottom: 40px;
+    padding: 14px 18px;
+    border: 1px dashed var(--clay);
+    border-radius: 14px;
+    color: var(--clay-deep);
+    font-size: 0.95rem;
+  }
+  .legal h2 { margin: 40px 0 12px; font-size: 1.5rem; }
+  .legal p { color: var(--espresso-2); }
+</style>

@@ -1,0 +1,33 @@
+---
+// Opening block for the sub-pages. `title` may contain <em> for the clay italic accent.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props { eyebrow: string; title: string; lead?: string; photo?: ImageMetadata; photoAlt?: string }
+const { eyebrow, title, lead, photo, photoAlt = '' } = Astro.props;
+---
+<section class:list={['page-hero', { 'page-hero--photo': photo }]}>
+  <div class="wrap page-hero__grid">
+    <div class="page-hero__text">
+      <p class="eyebrow" data-reveal="rise">{eyebrow}</p>
+      <h1 data-reveal="words" set:html={title} />
+      {lead && <p class="lead" data-reveal="rise">{lead}</p>}
+      <slot />
+    </div>
+    {photo && (
+      <div class="photo page-hero__photo" data-reveal="ripple" data-stone-spot="top-left">
+        <Image src={photo} alt={photoAlt} widths={[480, 800, 1200]} sizes="(max-width: 900px) 100vw, 44vw" loading="eager" />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .page-hero__grid { display: grid; gap: clamp(40px, 6vw, 80px); align-items: end; }
+  .page-hero--photo .page-hero__grid { grid-template-columns: 1.15fr 1fr; }
+  .page-hero__photo { aspect-ratio: 4 / 5; max-height: 72vh; }
+  @media (max-width: 900px) {
+    .page-hero--photo .page-hero__grid { grid-template-columns: 1fr; }
+    .page-hero__photo { aspect-ratio: 4 / 3; }
+  }
+</style>
