@@ -5,7 +5,7 @@ import { sound } from './audio';
 import { startScroll, stopScroll } from './scroll';
 import { initReveals } from './reveal';
 import { bindGlobal, initPage } from './ui';
-import { runIntro } from './intro';
+import { runIntro, introRunning } from './intro';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const webgl = (() => {
@@ -35,6 +35,8 @@ document.addEventListener('astro:after-swap', () => {
   const d = document.documentElement;
   d.classList.add('js');
   if (reduced) d.classList.add('reduced');
+  // the intro stays on screen while it switches language underneath
+  if (introRunning()) d.classList.add('show-intro');
 });
 document.addEventListener('astro:before-preparation', () => sound.whoosh());
 document.addEventListener('astro:before-swap', () => {
@@ -62,10 +64,10 @@ document.addEventListener('astro:page-load', async () => {
   if (document.querySelector('[data-map]')) lazy(import('./map'), (m) => m.startMap());
 
   const id = pageId;
-  if (document.documentElement.classList.contains('show-intro')) {
+  if (document.documentElement.classList.contains('show-intro') || introRunning()) {
     lenis?.stop();
     await runIntro();
-    lenis?.start();
+    if (id === pageId) lenis?.start();
   }
   if (id === pageId) initReveals(reduced);
 });

@@ -42,7 +42,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
         var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (reduced) d.classList.add('reduced');
         try {
-          if (!reduced && !sessionStorage.getItem('ts-intro')) d.classList.add('show-intro');
+          if (!sessionStorage.getItem('ts-intro')) d.classList.add('show-intro');
         } catch (e) {}
       })();
     </script>
@@ -50,7 +50,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
   </head>
   <body data-page={page}>
     <Header lang={lang} page={page} />
-    <Intro lang={lang} />
+    <Intro lang={lang} page={page} />
     <div class="page" transition:animate={linen}>
       <main id="main">
         <slot />
