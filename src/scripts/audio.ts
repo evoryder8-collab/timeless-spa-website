@@ -13,6 +13,8 @@ class SoundEngine {
   private noise!: AudioBuffer;
   private ambient: { stop: () => void } | null = null;
   private dripTimer = 0;
+  /** the page is hidden (phone locked, app switched): sound faded out and the engine suspended */
+  private asleep = false;
   private listeners = new Set<(on: boolean) => void>();
   private lastHover = 0;
 
@@ -66,6 +68,68 @@ class SoundEngine {
       nd[i] = last * 3.5;
     }
     this.noise = n;
+
+    // Phones cut audio abruptly when they lock or switch apps, which pops. Fade out first and
+    // suspend while hidden; fade back in on return.
+    const hide = () => this.sleep();
+    const show = () => this.wake();
+    document.addEventListener('visibilitychange', () => (document.hidden ? hide() : show()));
+    addEventListener('pagehide', hide);
+    addEventListener('pageshow', show);
+    document.addEventListener('freeze', hide);
+    document.addEventListener('resume', show);
+    // Safari reports 'interrupted' (lock, call, Siri): make sure the return starts from silence
+    ctx.addEventListener('statechange', () => {
+      if (ctx.state !== 'running') {
+        this.master.gain.cancelScheduledValues(0);
+        this.master.gain.value = 0;
+      }
+    });
+  }
+
+  private sleep() {
+    if (!this.ctx || this.asleep) return;
+    this.asleep = true;
+    const ctx = this.ctx;
+    const g = this.master.gain;
+    const t = ctx.currentTime;
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    g.linearRampToValueAtTime(0, t + 0.12);
+    setTimeout(() => {
+      if (this.asleep) ctx.suspend().catch(() => {});
+    }, 160);
+  }
+
+  private wake() {
+    if (!this.ctx || !this.asleep) return;
+    this.asleep = false;
+    if (!this.enabled) return;
+    const ctx = this.ctx;
+    const g = this.master.gain;
+    g.cancelScheduledValues(0);
+    g.value = 0;
+    ctx
+      .resume()
+      .then(() => {
+        const t = ctx.currentTime;
+        g.cancelScheduledValues(t);
+        g.setValueAtTime(0, t);
+        g.linearRampToValueAtTime(0.8, t + 1.8);
+      })
+      .catch(() => {});
+    // iOS may refuse to resume without a fresh touch: then the next tap brings the sound back
+    setTimeout(() => {
+      if (ctx.state === 'running' || !this.enabled) return;
+      const again = () => {
+        removeEventListener('pointerdown', again, true);
+        removeEventListener('keydown', again, true);
+        this.asleep = true;
+        this.wake();
+      };
+      addEventListener('pointerdown', again, true);
+      addEventListener('keydown', again, true);
+    }, 500);
   }
 
   /** route a node to the dry and reverb buses */
@@ -83,6 +147,7 @@ class SoundEngine {
     const ctx = this.ctx!;
     if (ctx.state !== 'running') await ctx.resume().catch(() => {});
     this.enabled = true;
+    this.asleep = false;
     try { sessionStorage.setItem(KEY, 'on'); } catch {}
     this.master.gain.cancelScheduledValues(ctx.currentTime);
     this.master.gain.setTargetAtTime(0.8, ctx.currentTime, 0.4);
@@ -178,7 +243,7 @@ class SoundEngine {
   }
 
   private ready() {
-    return this.enabled && this.ctx && this.ctx.state === 'running';
+    return this.enabled && !this.asleep && this.ctx && this.ctx.state === 'running';
   }
 
   // ───────────────────────── one-shots ─────────────────────────

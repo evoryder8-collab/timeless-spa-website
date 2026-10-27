@@ -66,7 +66,7 @@ All copy is a draft for the spa to review.
 
 - **Intro (first visit in a tab):**
   1. **Sound:** a large "Ja, mit Klang" (yes, with sound; marked recommended) and a smaller "Nein, ohne Klang" (no, without sound).
-  2. **Language:** the suggestion follows the Luma Wellness / Matthew Hua portals. A language in the address (`/en/…`) wins, then a choice saved earlier (`localStorage`), then the browser's languages, with English as the fallback. The suggested option gets a filling ring and a 5-second countdown, then is chosen as if tapped. Touching an option, using the keyboard, leaving the tab, or "Pausieren" (pause) stops it.
+  2. **Language:** the suggestion follows the Luma Wellness / Matthew Hua portals. A language in the address (`/en/…`) wins, then a choice saved earlier (`localStorage`), then the browser's languages, with English as the fallback. The suggested option fills with warm light over a 5-second countdown and glows, then is chosen as if tapped. Touching an option, using the keyboard, leaving the tab, or "Pausieren" (pause) stops it.
 
   Choosing the other language switches page under the intro through the client router, so sound keeps playing. The circle then opens over the site. Code: `src/components/Intro.astro`, `src/scripts/intro.ts`.
 - **Hero:** the water is a GPU ripple simulation drawn with a planar reflection. The pointer makes ripples, and a click or tap makes a bigger drop. Scrolling lifts the camera and drifts the stones apart. Rendering stops when the hero is off screen.

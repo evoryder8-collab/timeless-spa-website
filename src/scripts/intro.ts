@@ -1,7 +1,7 @@
 // First visit in a tab: choose sound, then language. The language suggestion follows the same rules as the
 // Luma Wellness and Matthew Hua portals:
 //   · a language in the address (/en/…) wins, then a choice saved earlier, then the browser's languages;
-//   · the suggested option gets a filling ring and a five-second countdown, then is chosen exactly as if tapped;
+//   · the suggested option fills with warm light over a five-second countdown, then is chosen exactly as if tapped;
 //   · touching any option, using the keyboard, or leaving the tab pauses it, and it can be paused or resumed.
 // Switching language uses the client router, so the sound that was just switched on keeps playing.
 import { gsap } from 'gsap';
@@ -173,7 +173,6 @@ function pickLanguage(el: HTMLElement, suggested: Lang, texts: Texts, onSuggest:
   return new Promise((resolve) => {
     const picks = [...el.querySelectorAll<HTMLAnchorElement>('[data-intro-pick]')];
     const target = picks.find((p) => p.dataset.introPick === suggested)!;
-    const ring = target.querySelector<SVGCircleElement>('.intro__progress circle')!;
     const bar = el.querySelector<HTMLElement>('[data-intro-countdown]')!;
     const secs = el.querySelector<HTMLElement>('[data-intro-seconds]')!;
     const label = el.querySelector<HTMLElement>('[data-intro-countdown-label]')!;
@@ -193,7 +192,9 @@ function pickLanguage(el: HTMLElement, suggested: Lang, texts: Texts, onSuggest:
 
     const render = () => {
       secs.textContent = String(Math.max(1, Math.ceil(remaining / 1000)));
-      ring.style.strokeDashoffset = String(remaining / COUNTDOWN);
+      const filled = 1 - remaining / COUNTDOWN;
+      target.style.setProperty('--fill', filled.toFixed(4));
+      target.style.setProperty('--edge', filled > 0.01 && filled < 0.995 ? '1' : '0');
       label.textContent = paused ? t.paused : t.countdown;
       toggle.textContent = paused ? t.resume : t.pause;
       toggle.setAttribute('aria-pressed', String(paused));
@@ -206,7 +207,11 @@ function pickLanguage(el: HTMLElement, suggested: Lang, texts: Texts, onSuggest:
       el.removeEventListener('keydown', onKey);
       document.removeEventListener('visibilitychange', onVisibility);
       bar.hidden = true;
-      picks.forEach((p) => p.classList.toggle('is-suggested', p.dataset.introPick === lang));
+      picks.forEach((p) => {
+        p.classList.toggle('is-suggested', p.dataset.introPick === lang);
+        p.style.setProperty('--fill', p.dataset.introPick === lang ? '1' : '0');
+        p.style.setProperty('--edge', '0');
+      });
       resolve(lang);
     };
     const tick = (now: number) => {
