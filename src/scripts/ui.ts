@@ -3,7 +3,7 @@
 import { gsap } from 'gsap';
 import type Lenis from 'lenis';
 import { sound } from './audio';
-import { requestTilt, buzz } from './tilt';
+import { requestTilt, buzz, tilt } from './tilt';
 
 let globalBound = false;
 
@@ -176,6 +176,44 @@ export function initPage({ lenis }: { lenis: Lenis | null }) {
     on(track, 'scroll', update, { passive: true });
     on(window, 'resize', update);
   });
+
+  // ───── cards lean towards the pointer, or with the phone's tilt ─────
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-tilt]')];
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    cards.forEach((el) => {
+      on(el, 'pointermove', (e: PointerEvent) => {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        el.classList.add('is-tilting');
+        el.style.transform = `perspective(900px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 9).toFixed(2)}deg) translateY(-4px)`;
+        el.style.setProperty('--gx', `${(x + 0.5) * 100}%`);
+        el.style.setProperty('--gy', `${(y + 0.5) * 100}%`);
+      });
+      on(el, 'pointerleave', () => {
+        el.classList.remove('is-tilting');
+        el.style.transform = '';
+      });
+    });
+  } else if (cards.length) {
+    // phones: the cards on screen follow the way the phone is held
+    const onScreen = new Set<HTMLElement>();
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => (e.isIntersecting ? onScreen.add(e.target as HTMLElement) : onScreen.delete(e.target as HTMLElement))));
+    cards.forEach((c) => io.observe(c));
+    let raf = 0;
+    const loop = () => {
+      raf = requestAnimationFrame(loop);
+      if (!tilt.active) return;
+      onScreen.forEach((el) => {
+        el.style.transform = `perspective(900px) rotateX(${(-tilt.y * 6).toFixed(2)}deg) rotateY(${(tilt.x * 8).toFixed(2)}deg)`;
+        el.style.setProperty('--gx', `${50 + tilt.x * 45}%`);
+        el.style.setProperty('--gy', `${30 + tilt.y * 40}%`);
+        el.classList.add('is-tilting');
+      });
+    };
+    raf = requestAnimationFrame(loop);
+    cleanups.push(() => { cancelAnimationFrame(raf); io.disconnect(); });
+  }
 
   // ───── today's opening hours (Cologne time) ─────
   const weekday = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Berlin', weekday: 'short' }).format(new Date());

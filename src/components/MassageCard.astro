@@ -9,7 +9,7 @@ interface Props { m: Treatment; lang: Lang }
 const { m, lang } = Astro.props;
 const t = ui[lang];
 ---
-<article class:list={['mcard', { 'mcard--photo': m.photo }]} data-massage data-world={m.world} data-warm={m.warm ? '' : undefined} data-stone-hover>
+<article class:list={['mcard', { 'mcard--photo': m.photo }]} data-massage data-tilt data-world={m.world} data-warm={m.warm ? '' : undefined} data-stone-hover>
   {m.photo && (
     <div class="mcard__photo">
       <Image src={m.photo} alt="" widths={[360, 640]} sizes="(max-width: 700px) 100vw, 320px" />

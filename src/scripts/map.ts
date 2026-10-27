@@ -3,8 +3,11 @@
 // olive and clay with warm 3D buildings. Nothing loads until the visitor taps "show map".
 import type { StyleSpecification, Map as MlMap } from 'maplibre-gl';
 import { sound } from './audio';
+import { startGlobe, type Teaser } from './globe';
 
-const C = {
+const WARM = {
+  buildings: ['#e4d3bf', '#d9b99b', '#c48f6c'],
+  sky: ['rgba(233, 220, 203, 0)', '#e9dccb', 'rgba(226, 173, 136, 0)', '#e2ad88'],
   bg: '#ede4d8',
   land: '#e6dccd',
   park: '#d7d6bf',
@@ -19,6 +22,25 @@ const C = {
   labelSoft: '#7a6b5e',
   halo: '#f1e9de',
 };
+// the Dark & Gold look: aubergine streets, gold-lit buildings
+const GOLD: typeof WARM = {
+  buildings: ['#2b2333', '#5b4a3c', '#b39563'],
+  sky: ['rgba(28, 21, 34, 0)', '#1c1522', 'rgba(110, 79, 51, 0)', '#6e4f33'],
+  bg: '#17121c',
+  land: '#1b1620',
+  park: '#1f211b',
+  wood: '#1d2019',
+  water: '#101820',
+  waterLine: '#16222b',
+  road: '#2a2231',
+  roadMajor: '#3a2f40',
+  casing: '#221b29',
+  rail: '#2e2635',
+  label: '#d6bf92',
+  labelSoft: '#9c8d75',
+  halo: '#120e16',
+};
+let C = WARM;
 // NASA Blue Marble: public-domain satellite imagery of the whole Earth, served by NASA GIBS (zoom 0–8)
 const EARTH_TILES = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_NextGeneration/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg';
 // between these zoom levels the satellite globe hands over to the city map
@@ -26,6 +48,7 @@ const HANDOVER: [number, number] = [6.5, 9.5];
 const fadeIn = (to = 1) => ['interpolate', ['linear'], ['zoom'], HANDOVER[0], 0, HANDOVER[1], to];
 
 function restyle(style: StyleSpecification) {
+  C = document.documentElement.dataset.look === 'gold' ? GOLD : WARM;
   style.layers = style.layers.filter((l) => l.id !== 'building' && !l.id.startsWith('highway-shield') && !l.id.startsWith('road_shield'));
   for (const l of style.layers) {
     const p = ((l as { paint?: Record<string, unknown> }).paint ??= {});
@@ -71,8 +94,8 @@ function restyle(style: StyleSpecification) {
   // a thin blue atmosphere around the globe in space; a warm haze on the horizon once the camera tilts
   style.sky = {
     'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 8, 0],
-    'sky-color': ['interpolate', ['linear'], ['zoom'], 8, 'rgba(233, 220, 203, 0)', 11, '#e9dccb'],
-    'horizon-color': ['interpolate', ['linear'], ['zoom'], 8, 'rgba(226, 173, 136, 0)', 11, '#e2ad88'],
+    'sky-color': ['interpolate', ['linear'], ['zoom'], 8, C.sky[0], 11, C.sky[1]],
+    'horizon-color': ['interpolate', ['linear'], ['zoom'], 8, C.sky[2], 11, C.sky[3]],
     'fog-color': C.bg,
     'sky-horizon-blend': 0.6,
     'horizon-fog-blend': 0.7,
@@ -88,7 +111,7 @@ function restyle(style: StyleSpecification) {
     'source-layer': 'building',
     minzoom: 13,
     paint: {
-      'fill-extrusion-color': ['interpolate', ['linear'], ['coalesce', ['get', 'render_height'], 0], 0, '#e4d3bf', 25, '#d9b99b', 80, '#c48f6c'],
+      'fill-extrusion-color': ['interpolate', ['linear'], ['coalesce', ['get', 'render_height'], 0], 0, C.buildings[0], 25, C.buildings[1], 80, C.buildings[2]],
       'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 13, 0, 14.6, ['coalesce', ['get', 'render_height'], 0]],
       'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
       'fill-extrusion-opacity': 0.92,
@@ -105,7 +128,10 @@ export function startMap(): () => void {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let map: MlMap | null = null;
   let dead = false;
-  let stopSpace = () => {};
+
+  // stars and a spinning Earth are there from the start, drawn from this site's own files
+  const space = makeSpace(block);
+  let teaser: Teaser | null = null;
 
   const load = async () => {
     if (!loadBtn || loadBtn.disabled) return;
@@ -122,11 +148,12 @@ export function startMap(): () => void {
       ml.setWorkerUrl(workerUrl);
       restyle(style);
       const small = innerWidth < 720;
+      // start exactly where the local globe is: Cologne in front, at the same size
       map = new ml.Map({
         container: canvas,
         style,
-        center: [lngLat[0] - 70, 22],
-        zoom: small ? 0.55 : 1.05,
+        center: [lngLat[0], lngLat[1] - 6],
+        zoom: teaser ? teaser.mapZoom() : small ? 0.9 : 1.5,
         pitch: 0,
         bearing: 0,
         attributionControl: false,
@@ -143,7 +170,6 @@ export function startMap(): () => void {
       label.style.opacity = '0';
       new ml.Marker({ element: el, anchor: 'center' }).setLngLat(lngLat).addTo(map);
 
-      const space = makeSpace(block);
       map.on('move', () => space.update(map!.getZoom(), map!.getCenter().lng));
 
       map.once('load', () => {
@@ -152,42 +178,39 @@ export function startMap(): () => void {
         canvas.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
         const target = { center: lngLat, zoom: small ? 16.2 : 16.8, pitch: 62, bearing: -28 };
         if (reduced) {
+          teaser?.handOff();
           map!.jumpTo(target);
           label.style.opacity = '1';
           return;
         }
-        // 1 · the Earth turns until Europe faces us
-        map!.easeTo({ center: [lngLat[0], lngLat[1] - 8], zoom: small ? 0.9 : 1.5, duration: 3200, easing: (t) => 1 - Math.pow(1 - t, 3), essential: true });
+        teaser?.handOff();
+        // down through the atmosphere to Ehrenfeld
+        sound.whoosh();
+        map!.flyTo({ ...target, duration: 8500, curve: 1.3, essential: true });
         map!.once('moveend', () => {
           if (dead) return;
-          // 2 · and then down through the atmosphere to Ehrenfeld
-          sound.whoosh();
-          map!.flyTo({ ...target, duration: 8000, curve: 1.3, essential: true });
-          map!.once('moveend', () => {
-            if (dead) return;
-            sound.bowl(0.8);
-            label.animate([{ opacity: 0, transform: 'translate(-50%, 8px)' }, { opacity: 1, transform: 'translate(-50%, 0)' }], { duration: 700, easing: 'cubic-bezier(.2,.7,.1,1)', fill: 'forwards' });
-            // and then the slowest possible turn around the spa
-            let bearing = target.bearing;
-            let orbit = true;
-            ['mousedown', 'touchstart', 'wheel', 'dragstart'].forEach((ev) => map!.on(ev as 'mousedown', () => (orbit = false)));
-            const spin = () => {
-              if (!map || dead || !orbit) return;
-              bearing += 0.04;
-              map.setBearing(bearing);
-              requestAnimationFrame(spin);
-            };
+          sound.bowl(0.8);
+          label.animate([{ opacity: 0, transform: 'translate(-50%, 8px)' }, { opacity: 1, transform: 'translate(-50%, 0)' }], { duration: 700, easing: 'cubic-bezier(.2,.7,.1,1)', fill: 'forwards' });
+          // and then the slowest possible turn around the spa
+          let bearing = target.bearing;
+          let orbit = true;
+          ['mousedown', 'touchstart', 'wheel', 'dragstart'].forEach((ev) => map!.on(ev as 'mousedown', () => (orbit = false)));
+          const spin = () => {
+            if (!map || dead || !orbit) return;
+            bearing += 0.04;
+            map.setBearing(bearing);
             requestAnimationFrame(spin);
-          });
+          };
+          requestAnimationFrame(spin);
         });
       });
-      stopSpace = space.stop;
     } catch {
       loadBtn.disabled = false;
       loadBtn.removeAttribute('aria-busy');
     }
   };
   loadBtn?.addEventListener('click', load);
+  teaser = startGlobe(block, lngLat, () => load());
 
   // directions chooser
   const sheet = block.querySelector<HTMLDialogElement>('[data-directions-sheet]');
@@ -205,7 +228,8 @@ export function startMap(): () => void {
     loadBtn?.removeEventListener('click', load);
     dirBtn?.removeEventListener('click', openSheet);
     sheet?.removeEventListener('click', sheetClick);
-    stopSpace();
+    space.stop();
+    teaser?.stop();
     map?.remove();
     map = null;
   };

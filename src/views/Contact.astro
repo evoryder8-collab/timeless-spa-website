@@ -44,9 +44,9 @@ const copy = {
         <div data-reveal="rise">
           <h2 class="contact__label">{copy.reach}</h2>
           <div class="contact__options">
-            <a class="contact__option" href={site.phone.href} data-sfx="bowl"><Icon name="phone" /><span><strong>{t.booking.call}</strong>{site.phone.display}</span></a>
-            <a class="contact__option" href={whatsappWith(t.booking.whatsappText)} target="_blank" rel="noopener" data-sfx="bowl"><Icon name="whatsapp" /><span><strong>WhatsApp</strong>{site.whatsapp.display}</span></a>
-            <a class="contact__option" href={mailto(t.booking.emailSubject)} data-sfx="bowl"><Icon name="mail" /><span><strong>{t.booking.email}</strong>{site.email}</span></a>
+            <a class="contact__option raised" href={site.phone.href} data-sfx="bowl"><Icon name="phone" /><span><strong>{t.booking.call}</strong>{site.phone.display}</span></a>
+            <a class="contact__option raised" href={whatsappWith(t.booking.whatsappText)} target="_blank" rel="noopener" data-sfx="bowl"><Icon name="whatsapp" /><span><strong>WhatsApp</strong>{site.whatsapp.display}</span></a>
+            <a class="contact__option raised" href={mailto(t.booking.emailSubject)} data-sfx="bowl"><Icon name="mail" /><span><strong>{t.booking.email}</strong>{site.email}</span></a>
           </div>
         </div>
         <div data-reveal="rise">
@@ -91,11 +91,11 @@ const copy = {
     gap: 16px;
     padding: 16px 18px;
     border-radius: 18px;
-    background: var(--linen);
     text-decoration: none;
-    transition: transform 0.5s var(--ease), background-color 0.3s;
+    transition: transform 0.5s var(--ease);
   }
-  .contact__option:hover { transform: translateX(5px); background: #fbf7f1; }
+  .contact__option:hover { transform: translateY(-2px); }
+  .contact__option:active { transform: scale(0.985); }
   .contact__option :global(svg) { width: 22px; height: 22px; flex: none; color: var(--clay-deep); }
   .contact__option strong { display: block; }
   .contact__option span { color: var(--muted); font-size: 0.95rem; overflow-wrap: anywhere; }

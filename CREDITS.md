@@ -15,3 +15,8 @@ All photos are from [Unsplash](https://unsplash.com) and used under the [Unsplas
 | towels-candles.jpg | Anna Keibalo | https://unsplash.com/photos/a-table-topped-with-candles-and-towels-next-to-a-jar-of-honey-kdAvS3_rNkY |
 | spa-room.jpg | visualsofdana | https://unsplash.com/photos/black-and-white-abstract-painting-on-wall-IfsRTQu6Djk |
 | herbal-bundles.jpg | Charles Chen | https://unsplash.com/photos/a-close-up-of-a-bunch-of-cinnamon-sticks-Gn2yRFtFKDU |
+
+## Earth imagery
+
+- `src/assets/earth/blue-marble-2048.jpg`: NASA Blue Marble ("land_ocean_ice"), NASA Goddard Space Flight Center / Visible Earth. Public domain. https://visibleearth.nasa.gov/images/57730
+- Map flight imagery: NASA Blue Marble Next Generation via NASA GIBS, public domain; street map © OpenStreetMap contributors via OpenFreeMap.

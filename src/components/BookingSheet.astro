@@ -16,16 +16,16 @@ const t = ui[lang];
     <p class="booking__lead">{t.booking.lead}</p>
 
     <div class="booking__options">
-      <a class="booking__option" href={site.phone.href} data-sfx="bowl">
-        <span class="booking__icon"><Icon name="phone" /></span>
+      <a class="booking__option raised" href={site.phone.href} data-sfx="bowl">
+        <span class="booking__icon lacquer-disc"><Icon name="phone" /></span>
         <span><strong>{t.booking.call}</strong><small>{site.phone.display}</small></span>
       </a>
-      <a class="booking__option" href={whatsappWith(t.booking.whatsappText)} target="_blank" rel="noopener" data-sfx="bowl">
-        <span class="booking__icon"><Icon name="whatsapp" /></span>
+      <a class="booking__option raised" href={whatsappWith(t.booking.whatsappText)} target="_blank" rel="noopener" data-sfx="bowl">
+        <span class="booking__icon lacquer-disc"><Icon name="whatsapp" /></span>
         <span><strong>{t.booking.whatsapp}</strong><small>{site.whatsapp.display}</small></span>
       </a>
-      <a class="booking__option" href={mailto(t.booking.emailSubject)} data-sfx="bowl">
-        <span class="booking__icon"><Icon name="mail" /></span>
+      <a class="booking__option raised" href={mailto(t.booking.emailSubject)} data-sfx="bowl">
+        <span class="booking__icon lacquer-disc"><Icon name="mail" /></span>
         <span><strong>{t.booking.email}</strong><small>{site.email}</small></span>
       </a>
     </div>
@@ -89,11 +89,11 @@ const t = ui[lang];
     gap: 16px;
     padding: 14px 16px;
     border-radius: 18px;
-    background: var(--sand);
     text-decoration: none;
-    transition: background-color 0.35s, transform 0.5s var(--ease);
+    transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
   }
-  .booking__option:hover { background: var(--sand-2); transform: translateX(4px); }
+  .booking__option:hover { transform: translateY(-2px); }
+  .booking__option:active { transform: scale(0.985); }
   .booking__option strong { display: block; font-size: 1.05rem; }
   .booking__option small { display: block; color: var(--muted); font-size: 0.9rem; }
   .booking__icon {
@@ -103,7 +103,6 @@ const t = ui[lang];
     height: 46px;
     flex: none;
     border-radius: 50%;
-    background: var(--clay-deep);
     color: var(--linen);
   }
   .booking__icon :global(svg) { width: 20px; height: 20px; }

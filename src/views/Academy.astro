@@ -71,7 +71,7 @@ const copy = {
       </div>
       <ol class="areas__list" data-reveal="stagger" data-stone-spot="top-right">
         {copy.areas.map(([title, text], i) => (
-          <li data-reveal-item data-stone-hover>
+          <li data-reveal-item data-stone-hover data-tilt>
             <span class="areas__num">{String(i + 1).padStart(2, '0')}</span>
             <h3>{title}</h3>
             <p>{text}</p>
@@ -98,6 +98,7 @@ const copy = {
 <style>
   .areas__list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 0; padding: 0; list-style: none; }
   .areas__list li {
+    position: relative;
     padding: 30px;
     border-radius: var(--radius);
     background: var(--sand);

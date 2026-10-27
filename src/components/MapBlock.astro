@@ -12,34 +12,14 @@ const de = lang === 'de';
   <div class="mapblock__canvas" data-map-canvas aria-label={de ? 'Karte: Timeless Spa in Köln-Ehrenfeld' : 'Map: Timeless Spa in Cologne-Ehrenfeld'} role="region"></div>
 
   <div class="mapblock__poster" data-map-poster>
-    <svg class="mapblock__art" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <rect width="600" height="400" fill="#e3d6c5" />
-      <path d="M-20 300 C 120 260, 210 330, 330 290 S 520 230, 640 270 L 640 420 L -20 420 Z" fill="#c9cdb8" />
-      <g fill="none" stroke="#f6f1ea" stroke-linecap="round">
-        <path d="M 330 -10 C 320 120, 345 230, 318 420" stroke-width="16" />
-        <path d="M -10 150 C 160 170, 300 160, 610 120" stroke-width="10" />
-        <path d="M 60 -10 L 250 420" stroke-width="6" />
-        <path d="M 470 -10 C 440 140, 520 260, 470 420" stroke-width="6" />
-        <path d="M -10 60 L 610 250" stroke-width="4" opacity=".8" />
-        <path d="M -10 360 L 610 330" stroke-width="4" opacity=".8" />
-      </g>
-      <g fill="#d6c4ad">
-        <rect x="350" y="40" width="70" height="44" rx="4" />
-        <rect x="200" y="200" width="60" height="58" rx="4" />
-        <rect x="380" y="180" width="54" height="40" rx="4" />
-        <rect x="90" y="70" width="80" height="50" rx="4" />
-        <rect x="500" y="40" width="70" height="60" rx="4" />
-      </g>
-    </svg>
-    <span class="mapblock__pin" aria-hidden="true"><span></span></span>
     <div class="mapblock__cta">
       <button class="btn" type="button" data-map-load>
-        <Icon name="pin" />{de ? 'Karte anzeigen' : 'Show map'}
+        <Icon name="nav" />{de ? 'Zum Timeless Spa fliegen' : 'Fly to Timeless Spa'}
       </button>
       <p>
         {de
-          ? 'Beim Laden der Karte werden Kartendaten von OpenFreeMap und Satellitenbilder der NASA abgerufen. Dabei wird Ihre IP-Adresse übertragen.'
-          : 'Loading the map fetches map data from OpenFreeMap and satellite imagery from NASA, which receive your IP address.'}
+          ? 'Startet die Karte: Dabei werden Kartendaten von OpenFreeMap und Satellitenbilder der NASA geladen und Ihre IP-Adresse wird übertragen.'
+          : 'Starts the map, which loads map data from OpenFreeMap and satellite imagery from NASA and sends them your IP address.'}
       </p>
     </div>
   </div>
@@ -81,44 +61,25 @@ const de = lang === 'de';
     isolation: isolate;
   }
   .mapblock__canvas { position: absolute; inset: 0; z-index: 1; }
-  .mapblock.is-live { background: radial-gradient(120% 90% at 50% 40%, #1a1626 0%, #0b0a12 55%, #050409 100%); }
+  .mapblock { background: radial-gradient(120% 90% at 50% 40%, #1a1626 0%, #0b0a12 55%, #050409 100%); }
   .mapblock :global(.mapblock__space) { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; transition: opacity 0.4s; }
   .mapblock__poster { z-index: 2; }
-  .mapblock__poster { position: absolute; inset: 0; display: grid; place-items: center; transition: opacity 1s var(--ease); }
-  .mapblock.is-live .mapblock__poster { opacity: 0; pointer-events: none; }
-  .mapblock__art { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .mapblock__pin {
-    position: absolute;
-    left: 57%;
-    top: 26%;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--clay-deep);
-    box-shadow: 0 0 0 6px rgb(181 112 79 / 0.25);
-  }
-  .mapblock__pin span {
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    border: 2px solid var(--clay);
-    animation: pin-pulse 2.6s ease-out infinite;
-  }
+  .mapblock__poster { position: absolute; inset: 0; display: grid; place-items: end center; padding-bottom: 92px; }
+  .mapblock.is-live .mapblock__poster { pointer-events: none; }
+  .mapblock.is-live .mapblock__cta { opacity: 0; transform: translateY(12px); }
+  .mapblock :global(.mapblock__globe) { position: absolute; inset: 0; width: 100%; height: 100%; }
   @keyframes pin-pulse { from { transform: scale(0.6); opacity: 1; } to { transform: scale(3.2); opacity: 0; } }
   .mapblock__cta {
     position: relative;
     display: grid;
     justify-items: center;
     gap: 14px;
-    max-width: 330px;
-    margin-top: 40px;
-    padding: 22px;
-    border-radius: 20px;
-    background: rgb(246 241 234 / 0.82);
-    backdrop-filter: blur(8px);
+    max-width: 340px;
+    margin: 0 16px;
     text-align: center;
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
   }
-  .mapblock__cta p { margin: 0; font-size: 0.82rem; line-height: 1.5; color: var(--muted); }
+  .mapblock__cta p { margin: 0; font-size: 0.74rem; line-height: 1.45; color: rgb(246 241 234 / 0.55); }
   .mapblock__bar {
     position: absolute;
     left: 14px;

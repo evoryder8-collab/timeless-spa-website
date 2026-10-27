@@ -204,7 +204,7 @@ export function startHero(section: HTMLElement): () => void {
 
   let renderer: THREE.WebGLRenderer;
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: !small, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   } catch {
     return () => {};
   }
@@ -212,11 +212,19 @@ export function startHero(section: HTMLElement): () => void {
     renderer.dispose();
     return () => {};
   }
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, small ? 1.5 : 1.75));
+  // phones have sharp screens: draw at up to 2× so the stone edges and reflection stay crisp
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, small ? 2 : 1.75));
+  const dpr = renderer.getPixelRatio();
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.0;
   stage.appendChild(renderer.domElement);
+
+  // the Dark & Gold look turns golden hour into a gold-lit night
+  const gold = document.documentElement.dataset.look === 'gold';
+  const palette = gold
+    ? { top: '#0d0a11', mid: '#18121d', horizon: '#4d3727', sun: '#ffd79a', skySun: '#5c4128', water: '#1a1418', near: '#0c090d', hemiSky: 0x6d5a7a, hemiGround: 0x0c0a0f, hemi: 0.75, sunColor: 0xffcf8a, sunI: 3.4, fill: 0xb8a6d6, fillI: 0.5 }
+    : { top: '#e9dccb', mid: '#ecd6be', horizon: '#e2ad88', sun: '#fff0dc', skySun: '#fff0dc', water: '#5b4636', near: '#3a2d24', hemiSky: 0xf3e3cf, hemiGround: 0x3a2a20, hemi: 1.1, sunColor: 0xffd6ae, sunI: 3.2, fill: 0xffe9d6, fillI: 0.9 };
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
@@ -225,6 +233,10 @@ export function startHero(section: HTMLElement): () => void {
   // ───── sky ─────
   const skyMat = new THREE.ShaderMaterial({ ...skyShader, uniforms: THREE.UniformsUtils.clone(skyShader.uniforms), side: THREE.BackSide, depthWrite: false });
   skyMat.uniforms.uSunDir.value.copy(sunDir);
+  skyMat.uniforms.uTop.value.set(palette.top);
+  skyMat.uniforms.uMid.value.set(palette.mid);
+  skyMat.uniforms.uHorizon.value.set(palette.horizon);
+  skyMat.uniforms.uSun.value.set(palette.skySun);
   const sky = new THREE.Mesh(new THREE.SphereGeometry(90, 32, 16), skyMat);
   sky.renderOrder = -1;
   scene.add(sky);
@@ -238,11 +250,11 @@ export function startHero(section: HTMLElement): () => void {
   scene.environmentIntensity = 0.55;
 
   // ───── lights: low sun behind, warm fill from the viewer ─────
-  scene.add(new THREE.HemisphereLight(0xf3e3cf, 0x3a2a20, 1.1));
-  const sun = new THREE.DirectionalLight(0xffd6ae, 3.2);
+  scene.add(new THREE.HemisphereLight(palette.hemiSky, palette.hemiGround, palette.hemi));
+  const sun = new THREE.DirectionalLight(palette.sunColor, palette.sunI);
   sun.position.copy(sunDir).multiplyScalar(20);
   scene.add(sun);
-  const fill = new THREE.DirectionalLight(0xffe9d6, 0.9);
+  const fill = new THREE.DirectionalLight(palette.fill, palette.fillI);
   fill.position.set(2.5, 3, 6);
   scene.add(fill);
 
@@ -278,8 +290,8 @@ export function startHero(section: HTMLElement): () => void {
 
   // ───── water ─────
   const water = new Reflector(new THREE.PlaneGeometry(60, 60), {
-    textureWidth: Math.round(innerWidth * (small ? 0.5 : 0.6)),
-    textureHeight: Math.round(innerHeight * (small ? 0.5 : 0.6)),
+    textureWidth: Math.min(1600, Math.round(innerWidth * dpr * (small ? 0.8 : 0.6))),
+    textureHeight: Math.min(1600, Math.round(innerHeight * dpr * (small ? 0.8 : 0.6))),
     clipBias: 0.002,
     shader: waterShader,
     multisample: 0,
@@ -288,6 +300,10 @@ export function startHero(section: HTMLElement): () => void {
   const wMat = water.material as THREE.ShaderMaterial;
   wMat.uniforms.uTexel.value.copy(texel);
   wMat.uniforms.uSunDir.value.copy(sunDir);
+  wMat.uniforms.uDeep.value.set(palette.water);
+  wMat.uniforms.uNear.value.set(palette.near);
+  wMat.uniforms.uSunColor.value.set(palette.sun);
+  wMat.uniforms.uFog.value.set(palette.horizon);
   scene.add(water);
 
   // ───── the cairn ─────
@@ -367,21 +383,47 @@ export function startHero(section: HTMLElement): () => void {
   // `shift` slides the picture sideways (a view offset), so the cairn sits beside the headline
   const view = { camY: 1.1, lookY: 0.62, camZ: 7.4, shift: 0 };
   let width = 1, height = 1;
+  const centre = new THREE.Vector3(0, 0.5, 0);
   const resize = () => {
     width = stage.clientWidth;
     height = stage.clientHeight;
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     const wide = camera.aspect > 1.05;
-    view.shift = wide ? THREE.MathUtils.clamp((camera.aspect - 1) * 0.6, 0.16, 0.26) : 0;
-    // on tall screens the camera looks down past the cairn so it sits in the top quarter, above the text
-    view.camZ = wide ? THREE.MathUtils.clamp(7.4 + (1.6 - camera.aspect) * 3, 7.4, 8.6) : 12;
-    view.camY = wide ? 1.1 : 1.6;
-    view.lookY = wide ? 0.62 : -1.68;
     camera.fov = wide ? 34 : 40;
-    if (view.shift) camera.setViewOffset(width, height, -width * view.shift, 0, width, height);
-    else camera.clearViewOffset();
-    camera.updateProjectionMatrix();
+    camera.clearViewOffset();
+    if (wide) {
+      // beside the headline: slide the picture sideways with a view offset
+      view.shift = THREE.MathUtils.clamp((camera.aspect - 1) * 0.6, 0.16, 0.26);
+      view.camZ = THREE.MathUtils.clamp(7.4 + (1.6 - camera.aspect) * 3, 7.4, 8.6);
+      view.camY = 1.1;
+      view.lookY = 0.62;
+      camera.setViewOffset(width, height, -width * view.shift, 0, width, height);
+      camera.updateProjectionMatrix();
+    } else {
+      // above the headline: measure the free space between the tap hint and the text,
+      // then size and place the cairn to sit in it, whatever the phone
+      const r = stage.getBoundingClientRect();
+      const text = section.querySelector('.hero__content .eyebrow')?.getBoundingClientRect();
+      const top = Math.min(height * 0.3, 150);
+      const bottom = Math.max(top + 140, (text ? text.top - r.top : height * 0.45) - 14);
+      const free = bottom - top;
+      const tan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      // the cairn is about 3 units wide (with its pebbles) and 1.3 tall above the water
+      const dist = Math.max((3.1 * height) / (0.86 * width * 2 * tan), (1.3 * height) / (0.8 * free * 2 * tan), 6);
+      view.shift = 0;
+      view.camZ = dist;
+      view.camY = 0.75 + dist * 0.07;
+      view.lookY = centre.y;
+      camera.position.set(0, view.camY, view.camZ);
+      camera.lookAt(0, view.lookY, 0);
+      camera.updateProjectionMatrix();
+      camera.updateMatrixWorld();
+      // then move the picture up so the cairn's centre lands in the middle of the free space
+      const y = (-centre.clone().project(camera).y * 0.5 + 0.5) * height;
+      camera.setViewOffset(width, height, 0, y - (top + free * 0.52), width, height);
+      camera.updateProjectionMatrix();
+    }
     steamMat.uniforms.uScale.value = height * renderer.getPixelRatio() * 0.012;
     dropMat.uniforms.uAspect.value = 1;
   };
