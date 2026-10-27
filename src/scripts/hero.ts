@@ -7,6 +7,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { sound } from './audio';
 import { bridge } from './stone-bridge';
+import { tilt, requestTilt, buzz } from './tilt';
 import { CAIRN, SKY, stoneGeometry, stoneMaterial } from './stone-shape';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -405,7 +406,7 @@ export function startHero(section: HTMLElement): () => void {
   const hit = new THREE.Vector3();
   let last: { u: number; v: number } | null = null;
   let lastSound = 0;
-  const toUv = (e: PointerEvent) => {
+  const toUv = (e: { clientX: number; clientY: number }) => {
     const r = stage.getBoundingClientRect();
     ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
@@ -415,21 +416,33 @@ export function startHero(section: HTMLElement): () => void {
     if (u < 0.02 || u > 0.98 || v < 0.02 || v > 0.98) return null;
     return { u, v };
   };
-  const onMove = (e: PointerEvent) => {
-    if (e.pointerType === 'touch') return;
-    const p = toUv(e);
-    if (!p) { last = null; return; }
-    const dist = last ? Math.hypot(p.u - last.u, p.v - last.v) : 1;
-    if (dist < 0.004) return;
-    const s = Math.min(0.012 + dist * 0.6, 0.05);
-    drop(p.u, p.v, s, 0.014);
-    last = p;
+  // a trail of ripples behind the mouse, or behind each finger (even while it scrolls the page)
+  const trail = (p: { u: number; v: number } | null, prev: { u: number; v: number } | null) => {
+    if (!p) return null;
+    const dist = prev ? Math.hypot(p.u - prev.u, p.v - prev.v) : 1;
+    if (dist < 0.004) return prev;
+    drop(p.u, p.v, Math.min(0.012 + dist * 0.6, 0.05), 0.014);
     section.classList.add('touched');
     const now = performance.now();
-    if (now - lastSound > 260 && dist > 0.01) {
+    if (now - lastSound > 260 && dist > 0.01 && dist < 1) {
       lastSound = now;
       sound.drip(Math.min(0.25 + dist * 8, 0.7));
     }
+    return p;
+  };
+  const mouse = { x: 0, y: 0 };
+  const onMove = (e: PointerEvent) => {
+    if (e.pointerType === 'touch') return;
+    last = trail(toUv(e), last);
+    mouse.x = (e.clientX / innerWidth) * 2 - 1;
+    mouse.y = (e.clientY / innerHeight) * 2 - 1;
+  };
+  const fingers = new Map<number, { u: number; v: number } | null>();
+  const onTouchMove = (e: TouchEvent) => {
+    for (const t of e.changedTouches) fingers.set(t.identifier, trail(toUv(t), fingers.get(t.identifier) ?? null));
+  };
+  const onTouchEnd = (e: TouchEvent) => {
+    for (const t of e.changedTouches) fingers.delete(t.identifier);
   };
   const onDown = (e: PointerEvent) => {
     if ((e.target as HTMLElement).closest('a, button')) return;
@@ -438,9 +451,15 @@ export function startHero(section: HTMLElement): () => void {
     drop(p.u, p.v, 0.11, 0.03);
     section.classList.add('touched');
     sound.drip(1);
+    if (e.pointerType === 'touch') {
+      buzz(10);
+      requestTilt();
+    }
   };
   section.addEventListener('pointermove', onMove);
   section.addEventListener('pointerdown', onDown);
+  section.addEventListener('touchmove', onTouchMove, { passive: true });
+  section.addEventListener('touchend', onTouchEnd, { passive: true });
 
   // the intro ends with one big drop in front of the stones
   const onIntro = () => {
@@ -463,6 +482,7 @@ export function startHero(section: HTMLElement): () => void {
   const topEdge = new THREE.Vector3();
   const tmp = new THREE.Vector3();
   const look = new THREE.Vector3();
+  const sway = { x: 0, y: 0 };
   let firstFrame = true;
 
   bridge.heroActive = true;
@@ -479,8 +499,13 @@ export function startHero(section: HTMLElement): () => void {
     const e = p * p * (3 - 2 * p);
 
     // camera
-    camera.position.set(e * 0.2, view.camY + e * 1.7, view.camZ - e * 1.2);
-    look.set(0, view.lookY - e * 0.25, 0);
+    // tilting the phone (or moving the mouse) moves the camera around the cairn, and the sun's glitter with it
+    const want = tilt.active ? tilt : { x: mouse.x * 0.35, y: mouse.y * 0.25 };
+    sway.x += (want.x - sway.x) * Math.min(1, dt * (tilt.active ? 4 : 1.5));
+    sway.y += (want.y - sway.y) * Math.min(1, dt * (tilt.active ? 4 : 1.5));
+    camera.position.set(e * 0.2 + sway.x * 0.9, view.camY + e * 1.7 - sway.y * 0.35, view.camZ - e * 1.2);
+    look.set(sway.x * 0.15, view.lookY - e * 0.25, 0);
+    wMat.uniforms.uSunDir.value.set(sunDir.x - sway.x * 0.35, sunDir.y + sway.y * 0.05, sunDir.z).normalize();
     camera.lookAt(look);
 
     // stones: gentle lift apart while scrolling, perfectly still at rest
@@ -551,6 +576,8 @@ export function startHero(section: HTMLElement): () => void {
     removeEventListener('ts:intro-exit', onIntro);
     section.removeEventListener('pointermove', onMove);
     section.removeEventListener('pointerdown', onDown);
+    section.removeEventListener('touchmove', onTouchMove);
+    section.removeEventListener('touchend', onTouchEnd);
     scene.traverse((o) => {
       const m = o as THREE.Mesh;
       m.geometry?.dispose();

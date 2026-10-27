@@ -1,5 +1,7 @@
-// The voucher card leans towards the pointer and catches the light; at rest it sways a little.
+// The voucher card leans towards the pointer (or follows the phone's tilt) and catches the light;
+// at rest it sways a little.
 import { gsap } from 'gsap';
+import { tilt as phone } from './tilt';
 
 export function startVouchers(): () => void {
   const cleanups: (() => void)[] = [];
@@ -30,7 +32,23 @@ export function startVouchers(): () => void {
     };
     box.addEventListener('pointermove', move);
     box.addEventListener('pointerleave', leave);
+
+    // on phones the card follows the way the phone is tilted, once the phone shares it
+    let raf = 0;
+    const follow = () => {
+      raf = requestAnimationFrame(follow);
+      if (!phone.active) return;
+      sway.pause();
+      tilt.rx += (-phone.y * 16 - tilt.rx) * 0.15;
+      tilt.ry += (phone.x * 22 - tilt.ry) * 0.15;
+      tilt.mx += (50 + phone.x * 45 - tilt.mx) * 0.15;
+      tilt.my += (35 + phone.y * 35 - tilt.my) * 0.15;
+      apply();
+    };
+    raf = requestAnimationFrame(follow);
+
     cleanups.push(() => {
+      cancelAnimationFrame(raf);
       sway.kill();
       gsap.killTweensOf(tilt);
       box.removeEventListener('pointermove', move);

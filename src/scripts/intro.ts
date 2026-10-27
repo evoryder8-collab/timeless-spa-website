@@ -1,6 +1,7 @@
 // First visit: breathe once with the circle, then choose to enter with or without sound.
 import { gsap } from 'gsap';
 import { sound } from './audio';
+import { requestTilt, buzz } from './tilt';
 
 export function runIntro(): Promise<void> {
   const html = document.documentElement;
@@ -35,6 +36,8 @@ export function runIntro(): Promise<void> {
       if (!btn) return;
       el.removeEventListener('click', choose);
       clearInterval(swap);
+      requestTilt();
+      buzz(12);
       if (btn.dataset.introEnter === 'sound') {
         await sound.enable();
         sound.bowl(1);

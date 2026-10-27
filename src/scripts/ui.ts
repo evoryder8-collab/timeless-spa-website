@@ -3,6 +3,7 @@
 import { gsap } from 'gsap';
 import type Lenis from 'lenis';
 import { sound } from './audio';
+import { requestTilt, buzz } from './tilt';
 
 let globalBound = false;
 
@@ -13,10 +14,13 @@ export function bindGlobal() {
 
   // interface sounds: data-sfx="click" | "bowl" on anything clickable
   document.addEventListener('click', (e) => {
+    // returning visitors skip the intro, so their first tap is when a phone may start sharing its tilt
+    requestTilt();
     const el = (e.target as HTMLElement).closest<HTMLElement>('[data-sfx]');
     if (!el) return;
     if (el.dataset.sfx === 'bowl') sound.bowl(0.8);
     else sound.click();
+    buzz(6);
   });
   document.addEventListener('pointerover', (e) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>('.btn, .site-nav a, .chip');
@@ -101,8 +105,12 @@ export function initPage({ lenis }: { lenis: Lenis | null }) {
       toggle.setAttribute('aria-expanded', 'true');
       lenis?.stop();
       html.style.overflow = 'hidden';
-      sound.click();
-      gsap.from(menu.querySelectorAll('li, .mobile-menu__foot'), { y: 30, opacity: 0, filter: 'blur(6px)', duration: 0.9, stagger: 0.06, ease: 'power3.out', clearProps: 'all' });
+      sound.drip(0.7);
+      // the menu spreads out from its button like a ripple
+      const b = toggle.getBoundingClientRect();
+      const at = `${b.left + b.width / 2}px ${b.top + b.height / 2}px`;
+      gsap.fromTo(menu, { clipPath: `circle(0px at ${at})` }, { clipPath: `circle(${Math.hypot(innerWidth, innerHeight)}px at ${at})`, duration: 0.9, ease: 'power3.inOut', clearProps: 'clipPath' });
+      gsap.from(menu.querySelectorAll('li, .mobile-menu__foot'), { y: 40, opacity: 0, filter: 'blur(8px)', duration: 1, delay: 0.25, stagger: 0.07, ease: 'power3.out', clearProps: 'all' });
     });
     on(document, 'keydown', (e: KeyboardEvent) => e.key === 'Escape' && closeMenu());
     menu.querySelectorAll('a').forEach((a) => on(a, 'click', closeMenu));
@@ -143,6 +151,31 @@ export function initPage({ lenis }: { lenis: Lenis | null }) {
       }),
     );
   }
+
+  // ───── swipe carousels (phones): the card in the middle comes forward ─────
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((track) => {
+    const items = [...track.children] as HTMLElement[];
+    let current: HTMLElement | null = null;
+    const update = () => {
+      const t = track.getBoundingClientRect();
+      const mid = t.left + t.width / 2;
+      let best: HTMLElement | null = null;
+      let bestD = Infinity;
+      for (const it of items) {
+        const r = it.getBoundingClientRect();
+        const d = Math.abs(r.left + r.width / 2 - mid);
+        it.style.setProperty('--focus', String(Math.max(0, 1 - d / t.width)));
+        if (d < bestD) { bestD = d; best = it; }
+      }
+      if (best && best !== current) {
+        if (current) { sound.hover(); buzz(4); }
+        current = best;
+      }
+    };
+    update();
+    on(track, 'scroll', update, { passive: true });
+    on(window, 'resize', update);
+  });
 
   // ───── today's opening hours (Cologne time) ─────
   const weekday = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Berlin', weekday: 'short' }).format(new Date());

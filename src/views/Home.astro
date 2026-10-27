@@ -136,7 +136,7 @@ const signature = massages.filter((m) => m.signature);
         <p class="eyebrow" data-reveal="rise">{copy.sigEyebrow}</p>
         <h2 data-reveal="words" set:html={copy.sigTitle} />
       </div>
-      <div class="signature__grid" data-reveal="stagger">
+      <div class="signature__grid" data-reveal="stagger" data-carousel>
         {signature.map((m) => (
           <a class="sig" href={`${href('massages', lang)}#${m.id}`} data-stone-hover data-warm={m.warm ? '' : undefined} data-sfx="click" data-reveal-item>
             <div class="sig__photo">
@@ -306,7 +306,26 @@ const signature = massages.filter((m) => m.signature);
   }
   @keyframes drip { to { top: 110%; } }
   @media (max-width: 980px) {
-    .hero__touch { display: none; }
+    .hero__touch {
+      left: 0;
+      right: 0;
+      top: calc(var(--header-h) + 6px);
+      bottom: auto;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+    .hero__touch::after {
+      /* a ring that keeps inviting a tap until the water has been touched */
+      content: '';
+      display: block;
+      width: 34px;
+      height: 34px;
+      margin: 10px auto 0;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      animation: invite 2.2s ease-out infinite;
+    }
+    @keyframes invite { from { transform: scale(0.4); opacity: 0.9; } to { transform: scale(1.6); opacity: 0; } }
     .hero__scroll { display: none; }
     .hero__veil, .hero.has-webgl .hero__veil {
       background: linear-gradient(0deg, rgb(237 228 216 / 0.94) 0%, rgb(237 228 216 / 0.75) 42%, transparent 72%);
@@ -390,6 +409,28 @@ const signature = massages.filter((m) => m.signature);
   @media (max-width: 900px) {
     .welcome__grid, .gift__grid, .find__grid { grid-template-columns: 1fr; }
     .welcome__photo, .find__photo { aspect-ratio: 4 / 3; }
-    .signature__grid, .visit__steps { grid-template-columns: 1fr; }
+    .visit__steps { grid-template-columns: 1fr; }
+    /* phones: the signature massages become a swipeable row; the card in the middle comes forward */
+    .signature__grid {
+      display: flex;
+      gap: 14px;
+      margin-inline: calc(-1 * var(--gutter));
+      padding: 10px var(--gutter) 24px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--gutter);
+      scrollbar-width: none;
+      overscroll-behavior-x: contain;
+    }
+    .signature__grid::-webkit-scrollbar { display: none; }
+    /* `scale` and the children's opacity, so the scroll reveal (transform, opacity on the card) never fights it */
+    .sig {
+      --focus: 1;
+      flex: 0 0 80%;
+      scroll-snap-align: center;
+      scale: calc(0.9 + 0.1 * var(--focus));
+      transition: scale 0.25s ease-out, box-shadow 0.8s var(--ease);
+    }
+    .sig > * { opacity: calc(0.5 + 0.5 * var(--focus)); transition: opacity 0.25s ease-out; }
   }
 </style>

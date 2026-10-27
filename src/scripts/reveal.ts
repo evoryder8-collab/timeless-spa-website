@@ -42,7 +42,7 @@ function play(el: HTMLElement) {
   if (kind === 'words') {
     gsap.from(el.querySelectorAll('.w'), { yPercent: 55, opacity: 0, filter: 'blur(10px)', duration: 1.5, stagger: 0.065, ease: 'power3.out', clearProps: 'filter' });
   } else if (kind === 'stagger') {
-    gsap.from(el.querySelectorAll('[data-reveal-item]'), { y: 50, opacity: 0, filter: 'blur(6px)', duration: 1.3, stagger: 0.12, ease: 'power3.out', clearProps: 'filter,transform' });
+    gsap.from(el.querySelectorAll('[data-reveal-item]'), { y: 50, opacity: 0, filter: 'blur(6px)', duration: 1.3, stagger: 0.12, ease: 'power3.out', clearProps: 'filter,transform,opacity' });
   } else if (kind === 'ripple') {
     const img = el.querySelector('img');
     const ring = document.createElement('span');
@@ -54,7 +54,7 @@ function play(el: HTMLElement) {
     tl.fromTo(ring, { scale: 0, opacity: 1 }, { scale: 3.4, opacity: 0, duration: 1.8, ease: 'power2.out' }, 0.15);
     sound.drip(0.35);
   } else {
-    gsap.from(el, { y: 34, opacity: 0, filter: 'blur(6px)', duration: 1.3, ease: 'power3.out', clearProps: 'filter,transform' });
+    gsap.from(el, { y: 34, opacity: 0, filter: 'blur(6px)', duration: 1.3, ease: 'power3.out', clearProps: 'filter,transform,opacity' });
   }
 }
 

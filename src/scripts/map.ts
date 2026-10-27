@@ -1,5 +1,6 @@
-// Contact map: MapLibre with OpenFreeMap tiles, recoloured in sand, olive and clay, with warm 3D buildings.
-// Loads only after the visitor taps "show map", then flies in from above Cologne to the spa.
+// Contact map: starts as a real Earth floating in space (NASA Blue Marble on MapLibre's globe), turns to Europe
+// and dives down to the spa, where the satellite picture gives way to OpenFreeMap streets recoloured in sand,
+// olive and clay with warm 3D buildings. Nothing loads until the visitor taps "show map".
 import type { StyleSpecification, Map as MlMap } from 'maplibre-gl';
 import { sound } from './audio';
 
@@ -18,13 +19,22 @@ const C = {
   labelSoft: '#7a6b5e',
   halo: '#f1e9de',
 };
-const DOM: [number, number] = [6.9583, 50.9413]; // Cologne Cathedral, where the flight begins
+// NASA Blue Marble: public-domain satellite imagery of the whole Earth, served by NASA GIBS (zoom 0–8)
+const EARTH_TILES = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_NextGeneration/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg';
+// between these zoom levels the satellite globe hands over to the city map
+const HANDOVER: [number, number] = [6.5, 9.5];
+const fadeIn = (to = 1) => ['interpolate', ['linear'], ['zoom'], HANDOVER[0], 0, HANDOVER[1], to];
 
 function restyle(style: StyleSpecification) {
   style.layers = style.layers.filter((l) => l.id !== 'building' && !l.id.startsWith('highway-shield') && !l.id.startsWith('road_shield'));
   for (const l of style.layers) {
     const p = ((l as { paint?: Record<string, unknown> }).paint ??= {});
     const id = l.id;
+    // the street map only appears once the camera is close to the ground
+    const opacity = { background: 'background-opacity', fill: 'fill-opacity', line: 'line-opacity', symbol: 'text-opacity' }[l.type as string];
+    if (opacity) p[opacity] = fadeIn(typeof p[opacity] === 'number' ? (p[opacity] as number) : 1);
+    if (l.type === 'symbol') p['icon-opacity'] = fadeIn();
+
     if (l.type === 'background') p['background-color'] = C.bg;
     else if (l.type === 'fill') {
       if (id === 'park') p['fill-color'] = C.park;
@@ -44,6 +54,31 @@ function restyle(style: StyleSpecification) {
       p['text-halo-width'] = 1.4;
     }
   }
+  // the Earth from space, under everything else
+  style.sources.earth = { type: 'raster', tiles: [EARTH_TILES], tileSize: 256, maxzoom: 8, attribution: 'Imagery © NASA Blue Marble (GIBS)' };
+  style.layers.splice(1, 0, {
+    id: 'earth',
+    type: 'raster',
+    source: 'earth',
+    maxzoom: HANDOVER[1] + 0.5,
+    paint: {
+      'raster-opacity': ['interpolate', ['linear'], ['zoom'], HANDOVER[0], 1, HANDOVER[1], 0],
+      'raster-contrast': 0.08,
+      'raster-fade-duration': 250,
+    },
+  });
+  style.projection = { type: 'globe' };
+  // a thin blue atmosphere around the globe in space; a warm haze on the horizon once the camera tilts
+  style.sky = {
+    'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 8, 0],
+    'sky-color': ['interpolate', ['linear'], ['zoom'], 8, 'rgba(233, 220, 203, 0)', 11, '#e9dccb'],
+    'horizon-color': ['interpolate', ['linear'], ['zoom'], 8, 'rgba(226, 173, 136, 0)', 11, '#e2ad88'],
+    'fog-color': C.bg,
+    'sky-horizon-blend': 0.6,
+    'horizon-fog-blend': 0.7,
+    'fog-ground-blend': 0.5,
+  };
+
   // warm 3D buildings under the labels: low ones sand, tall ones clay
   const labelIdx = style.layers.findIndex((l) => l.type === 'symbol');
   style.layers.splice(labelIdx, 0, {
@@ -70,6 +105,7 @@ export function startMap(): () => void {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let map: MlMap | null = null;
   let dead = false;
+  let stopSpace = () => {};
 
   const load = async () => {
     if (!loadBtn || loadBtn.disabled) return;
@@ -85,11 +121,12 @@ export function startMap(): () => void {
       if (dead) return;
       ml.setWorkerUrl(workerUrl);
       restyle(style);
+      const small = innerWidth < 720;
       map = new ml.Map({
         container: canvas,
         style,
-        center: DOM,
-        zoom: 11.2,
+        center: [lngLat[0] - 70, 22],
+        zoom: small ? 0.55 : 1.05,
         pitch: 0,
         bearing: 0,
         attributionControl: false,
@@ -106,32 +143,45 @@ export function startMap(): () => void {
       label.style.opacity = '0';
       new ml.Marker({ element: el, anchor: 'center' }).setLngLat(lngLat).addTo(map);
 
+      const space = makeSpace(block);
+      map.on('move', () => space.update(map!.getZoom(), map!.getCenter().lng));
+
       map.once('load', () => {
         block.classList.add('is-live');
-        const target = { center: lngLat, zoom: innerWidth < 720 ? 16.2 : 16.8, pitch: 62, bearing: -28 };
+        // keep the credits folded into the (i) button so they don't cover the globe
+        canvas.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
+        const target = { center: lngLat, zoom: small ? 16.2 : 16.8, pitch: 62, bearing: -28 };
         if (reduced) {
           map!.jumpTo(target);
           label.style.opacity = '1';
           return;
         }
-        sound.whoosh();
-        map!.flyTo({ ...target, duration: 6500, curve: 1.6, essential: true });
+        // 1 · the Earth turns until Europe faces us
+        map!.easeTo({ center: [lngLat[0], lngLat[1] - 8], zoom: small ? 0.9 : 1.5, duration: 3200, easing: (t) => 1 - Math.pow(1 - t, 3), essential: true });
         map!.once('moveend', () => {
-          sound.bowl(0.8);
-          label.animate([{ opacity: 0, transform: 'translate(-50%, 8px)' }, { opacity: 1, transform: 'translate(-50%, 0)' }], { duration: 700, easing: 'cubic-bezier(.2,.7,.1,1)', fill: 'forwards' });
-          // and then the slowest possible turn around the spa
-          let bearing = target.bearing;
-          let orbit = true;
-          ['mousedown', 'touchstart', 'wheel', 'dragstart'].forEach((ev) => map!.on(ev as 'mousedown', () => (orbit = false)));
-          const spin = () => {
-            if (!map || dead || !orbit) return;
-            bearing += 0.04;
-            map.setBearing(bearing);
+          if (dead) return;
+          // 2 · and then down through the atmosphere to Ehrenfeld
+          sound.whoosh();
+          map!.flyTo({ ...target, duration: 8000, curve: 1.3, essential: true });
+          map!.once('moveend', () => {
+            if (dead) return;
+            sound.bowl(0.8);
+            label.animate([{ opacity: 0, transform: 'translate(-50%, 8px)' }, { opacity: 1, transform: 'translate(-50%, 0)' }], { duration: 700, easing: 'cubic-bezier(.2,.7,.1,1)', fill: 'forwards' });
+            // and then the slowest possible turn around the spa
+            let bearing = target.bearing;
+            let orbit = true;
+            ['mousedown', 'touchstart', 'wheel', 'dragstart'].forEach((ev) => map!.on(ev as 'mousedown', () => (orbit = false)));
+            const spin = () => {
+              if (!map || dead || !orbit) return;
+              bearing += 0.04;
+              map.setBearing(bearing);
+              requestAnimationFrame(spin);
+            };
             requestAnimationFrame(spin);
-          };
-          requestAnimationFrame(spin);
+          });
         });
       });
+      stopSpace = space.stop;
     } catch {
       loadBtn.disabled = false;
       loadBtn.removeAttribute('aria-busy');
@@ -155,7 +205,58 @@ export function startMap(): () => void {
     loadBtn?.removeEventListener('click', load);
     dirBtn?.removeEventListener('click', openSheet);
     sheet?.removeEventListener('click', sheetClick);
+    stopSpace();
     map?.remove();
     map = null;
+  };
+}
+
+/** Deep space behind the globe: a field of softly twinkling stars that drifts as the Earth turns
+ *  and fades into the sand-coloured sky as the camera comes down. */
+function makeSpace(block: HTMLElement) {
+  const el = document.createElement('canvas');
+  el.className = 'mapblock__space';
+  el.setAttribute('aria-hidden', 'true');
+  block.prepend(el);
+  const ctx = el.getContext('2d')!;
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const stars = Array.from({ length: 420 }, () => ({
+    x: Math.random(),
+    y: Math.random(),
+    r: Math.random() ** 3 * 1.4 + 0.25,
+    a: Math.random() * 0.7 + 0.3,
+    tw: Math.random() * Math.PI * 2,
+    warm: Math.random() < 0.18,
+  }));
+  let shift = 0;
+  let alpha = 1;
+  let raf = 0;
+  const draw = (t: number) => {
+    raf = requestAnimationFrame(draw);
+    if (alpha <= 0.01) return;
+    const w = (el.width = el.clientWidth * dpr);
+    const h = (el.height = el.clientHeight * dpr);
+    ctx.clearRect(0, 0, w, h);
+    for (const s of stars) {
+      const x = (((s.x * w - shift * dpr) % w) + w) % w;
+      const tw = 0.65 + 0.35 * Math.sin(t / 900 + s.tw);
+      ctx.globalAlpha = s.a * tw;
+      ctx.fillStyle = s.warm ? '#ffd9b8' : '#f4f1ff';
+      ctx.beginPath();
+      ctx.arc(x, s.y * h, s.r * dpr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+  raf = requestAnimationFrame(draw);
+  return {
+    update(zoom: number, lng: number) {
+      shift = lng * 1.6;
+      alpha = 1 - Math.min(1, Math.max(0, (zoom - 4) / 3));
+      el.style.opacity = String(alpha);
+    },
+    stop() {
+      cancelAnimationFrame(raf);
+      el.remove();
+    },
   };
 }

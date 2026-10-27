@@ -5,11 +5,12 @@
 import * as THREE from 'three';
 import { sound } from './audio';
 import { bridge } from './stone-bridge';
+import { buzz } from './tilt';
 import { TRAVELLER, stoneGeometry, stoneMaterial } from './stone-shape';
 
 const BOX = 280; // canvas size in CSS pixels; the stone is drawn inside it at any size up to ~240px
 
-type Anchor = { el: Element; corner: 'top-left' | 'top-right'; warm: boolean };
+type Anchor = { el: Element; corner: 'top-left' | 'top-right'; warm: boolean; focus?: boolean };
 
 let ready = false;
 let renderer: THREE.WebGLRenderer;
@@ -38,7 +39,7 @@ const q = new THREE.Quaternion().copy(restQ);
 const axis = new THREE.Vector3();
 const dq = new THREE.Quaternion();
 
-const baseSize = () => (innerWidth < 760 ? 54 : 74);
+const baseSize = () => (innerWidth < 760 ? 60 : 74);
 const fineMq = matchMedia('(hover: hover) and (pointer: fine)');
 const fine = () => fineMq.matches;
 
@@ -90,6 +91,7 @@ export function initStone(layer: HTMLElement) {
   hitEl.addEventListener('click', () => {
     wobble = 1;
     sound.stone(0.9);
+    buzz(14);
   });
   layer.append(wrap, hitEl);
 
@@ -120,6 +122,10 @@ export function stoneOnPage(): () => void {
     warm: false,
   }));
   const hoverables = [...document.querySelectorAll<HTMLElement>('[data-stone-hover]')];
+  // phones have no hover: the massage in the middle of the screen is the one the stone goes to
+  if (!fine()) {
+    spots.push(...hoverables.map((el) => ({ el, corner: 'top-right' as const, warm: el.hasAttribute('data-warm'), focus: true })));
+  }
   const enter = (e: Event) => {
     if (!fine()) return;
     clearTimeout(hoverTimer);
@@ -155,7 +161,7 @@ function anchorPoint(a: Anchor, s: number) {
   };
 }
 
-/** The visible spot closest to the middle of the screen */
+/** The visible spot closest to the middle of the screen; on phones a card in the middle wins */
 function pickSpot(s: number) {
   const header = 90;
   let best: Anchor | null = null;
@@ -163,13 +169,25 @@ function pickSpot(s: number) {
   for (const a of spots) {
     const r = a.el.getBoundingClientRect();
     if (!r.width || r.top < header + s * 0.4 || r.top > innerHeight - s) continue;
-    const d = Math.abs(r.top - innerHeight * 0.45);
+    // cards in a sideways carousel only count while mostly on screen
+    const cx = (r.left + r.right) / 2;
+    if (cx < innerWidth * 0.2 || cx > innerWidth * 0.8) continue;
+    let d = Math.abs(r.top - innerHeight * 0.45) + Math.abs(cx - innerWidth / 2) * 0.5;
+    if (a.focus) d -= 60;
     if (d < bestD) {
       bestD = d;
       best = a;
     }
   }
   return best;
+}
+
+/** On phones the stone can always sit on the floating booking bar */
+function bookBar() {
+  const bar = document.querySelector('.book-bar');
+  if (!bar || document.documentElement.classList.contains('book-bar-hidden')) return null;
+  const r = bar.getBoundingClientRect();
+  return r.width && r.top < innerHeight ? bar : null;
 }
 
 function tick(dt: number) {
@@ -189,10 +207,20 @@ function tick(dt: number) {
     warm = hoverAnchor.warm;
   } else {
     const spot = pickSpot(s0);
+    const bar = spot ? null : !fine() && bookBar();
     if (spot) {
       target = anchorPoint(spot, s0);
-      if (spot.el !== lastSpot) anchorPrev.ok = false;
+      warm = spot.warm;
+      if (spot.el !== lastSpot) {
+        anchorPrev.ok = false;
+        if (spot.warm) sound.warm();
+      }
       lastSpot = spot.el;
+    } else if (bar) {
+      target = anchorPoint({ el: bar, corner: 'top-left', warm: false }, s0 * 0.85);
+      targetSize = s0 * 0.85;
+      if (bar !== lastSpot) anchorPrev.ok = false;
+      lastSpot = bar;
     } else if (fine()) {
       // nothing to sit on: rest in the lower left corner
       target = { x: 46, y: innerHeight - 40 };
