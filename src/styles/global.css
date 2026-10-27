@@ -434,3 +434,6 @@ html[data-look='gold'] .mcard[data-warm]:hover { background: #2a2030; }
 html[data-look='gold'] .menu__sample, html[data-look='gold'] .legal__notice { color: var(--gold); border-color: var(--gold); }
 html[data-look='gold'] .philosophy__pillars h3,
 html[data-look='gold'] .philosophy__claim em { color: var(--ink); }
+@media (max-width: 980px) {
+  .look-switch { top: auto; right: auto; left: 12px; bottom: calc(86px + env(safe-area-inset-bottom)); }
+}
