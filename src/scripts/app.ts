@@ -31,22 +31,10 @@ function lazy<T>(load: Promise<T>, start: (m: T) => () => void) {
 
 bindGlobal();
 
-const applyLook = () => {
-  const d = document.documentElement;
-  try {
-    const look = sessionStorage.getItem('ts-look');
-    d.classList.toggle('previewing-look', !!look);
-    if (look === 'gold') d.dataset.look = 'gold';
-    else delete d.dataset.look;
-    document.querySelectorAll('[data-look-link]').forEach((a) => a.setAttribute('aria-current', String(a.getAttribute('data-look-link') === (look || 'warm'))));
-  } catch {}
-};
-applyLook();
 document.addEventListener('astro:after-swap', () => {
   const d = document.documentElement;
   d.classList.add('js');
   if (reduced) d.classList.add('reduced');
-  applyLook();
 });
 document.addEventListener('astro:before-preparation', () => sound.whoosh());
 document.addEventListener('astro:before-swap', () => {

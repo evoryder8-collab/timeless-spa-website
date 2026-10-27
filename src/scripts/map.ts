@@ -5,7 +5,7 @@ import type { StyleSpecification, Map as MlMap } from 'maplibre-gl';
 import { sound } from './audio';
 import { startGlobe, type Teaser } from './globe';
 
-const WARM = {
+const C = {
   buildings: ['#e4d3bf', '#d9b99b', '#c48f6c'],
   sky: ['rgba(233, 220, 203, 0)', '#e9dccb', 'rgba(226, 173, 136, 0)', '#e2ad88'],
   bg: '#ede4d8',
@@ -22,25 +22,6 @@ const WARM = {
   labelSoft: '#7a6b5e',
   halo: '#f1e9de',
 };
-// the Dark & Gold look: aubergine streets, gold-lit buildings
-const GOLD: typeof WARM = {
-  buildings: ['#2b2333', '#5b4a3c', '#b39563'],
-  sky: ['rgba(28, 21, 34, 0)', '#1c1522', 'rgba(110, 79, 51, 0)', '#6e4f33'],
-  bg: '#17121c',
-  land: '#1b1620',
-  park: '#1f211b',
-  wood: '#1d2019',
-  water: '#101820',
-  waterLine: '#16222b',
-  road: '#2a2231',
-  roadMajor: '#3a2f40',
-  casing: '#221b29',
-  rail: '#2e2635',
-  label: '#d6bf92',
-  labelSoft: '#9c8d75',
-  halo: '#120e16',
-};
-let C = WARM;
 // NASA Blue Marble: public-domain satellite imagery of the whole Earth, served by NASA GIBS (zoom 0–8)
 const EARTH_TILES = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_NextGeneration/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg';
 // between these zoom levels the satellite globe hands over to the city map
@@ -48,7 +29,6 @@ const HANDOVER: [number, number] = [6.5, 9.5];
 const fadeIn = (to = 1) => ['interpolate', ['linear'], ['zoom'], HANDOVER[0], 0, HANDOVER[1], to];
 
 function restyle(style: StyleSpecification) {
-  C = document.documentElement.dataset.look === 'gold' ? GOLD : WARM;
   style.layers = style.layers.filter((l) => l.id !== 'building' && !l.id.startsWith('highway-shield') && !l.id.startsWith('road_shield'));
   for (const l of style.layers) {
     const p = ((l as { paint?: Record<string, unknown> }).paint ??= {});

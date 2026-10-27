@@ -40,14 +40,6 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
         var d = document.documentElement;
         d.classList.add('js');
         var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-        // review only: ?look=gold or ?look=warm previews a colour direction for this browser session
-        try {
-          var q = new URLSearchParams(location.search).get('look');
-          if (q === 'gold' || q === 'warm') sessionStorage.setItem('ts-look', q);
-          var look = sessionStorage.getItem('ts-look');
-          if (look) d.classList.add('previewing-look');
-          if (look === 'gold') d.dataset.look = 'gold';
-        } catch (e) {}
         if (reduced) d.classList.add('reduced');
         try {
           if (!reduced && !sessionStorage.getItem('ts-intro')) d.classList.add('show-intro');
@@ -67,10 +59,6 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
     </div>
     <BookingSheet lang={lang} />
     <div class="stone-layer" data-stone-layer transition:persist="stone-layer" aria-hidden="true"></div>
-    <nav class="look-switch glass-disc" aria-label="Look preview" transition:animate="none">
-      <a href="?look=warm" data-look-link="warm" data-astro-reload>Warm</a>
-      <a href="?look=gold" data-look-link="gold" data-astro-reload>Dark &amp; Gold</a>
-    </nav>
     <script>
       import '../scripts/app';
     </script>

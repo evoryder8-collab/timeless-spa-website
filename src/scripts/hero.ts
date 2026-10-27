@@ -220,12 +220,6 @@ export function startHero(section: HTMLElement): () => void {
   renderer.toneMappingExposure = 1.0;
   stage.appendChild(renderer.domElement);
 
-  // the Dark & Gold look turns golden hour into a gold-lit night
-  const gold = document.documentElement.dataset.look === 'gold';
-  const palette = gold
-    ? { top: '#0d0a11', mid: '#18121d', horizon: '#4d3727', sun: '#ffd79a', skySun: '#5c4128', water: '#1a1418', near: '#0c090d', hemiSky: 0x6d5a7a, hemiGround: 0x0c0a0f, hemi: 0.75, sunColor: 0xffcf8a, sunI: 3.4, fill: 0xb8a6d6, fillI: 0.5 }
-    : { top: '#e9dccb', mid: '#ecd6be', horizon: '#e2ad88', sun: '#fff0dc', skySun: '#fff0dc', water: '#5b4636', near: '#3a2d24', hemiSky: 0xf3e3cf, hemiGround: 0x3a2a20, hemi: 1.1, sunColor: 0xffd6ae, sunI: 3.2, fill: 0xffe9d6, fillI: 0.9 };
-
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
   const sunDir = new THREE.Vector3(-0.38, 0.1, -1).normalize();
@@ -233,10 +227,6 @@ export function startHero(section: HTMLElement): () => void {
   // ───── sky ─────
   const skyMat = new THREE.ShaderMaterial({ ...skyShader, uniforms: THREE.UniformsUtils.clone(skyShader.uniforms), side: THREE.BackSide, depthWrite: false });
   skyMat.uniforms.uSunDir.value.copy(sunDir);
-  skyMat.uniforms.uTop.value.set(palette.top);
-  skyMat.uniforms.uMid.value.set(palette.mid);
-  skyMat.uniforms.uHorizon.value.set(palette.horizon);
-  skyMat.uniforms.uSun.value.set(palette.skySun);
   const sky = new THREE.Mesh(new THREE.SphereGeometry(90, 32, 16), skyMat);
   sky.renderOrder = -1;
   scene.add(sky);
@@ -250,11 +240,11 @@ export function startHero(section: HTMLElement): () => void {
   scene.environmentIntensity = 0.55;
 
   // ───── lights: low sun behind, warm fill from the viewer ─────
-  scene.add(new THREE.HemisphereLight(palette.hemiSky, palette.hemiGround, palette.hemi));
-  const sun = new THREE.DirectionalLight(palette.sunColor, palette.sunI);
+  scene.add(new THREE.HemisphereLight(0xf3e3cf, 0x3a2a20, 1.1));
+  const sun = new THREE.DirectionalLight(0xffd6ae, 3.2);
   sun.position.copy(sunDir).multiplyScalar(20);
   scene.add(sun);
-  const fill = new THREE.DirectionalLight(palette.fill, palette.fillI);
+  const fill = new THREE.DirectionalLight(0xffe9d6, 0.9);
   fill.position.set(2.5, 3, 6);
   scene.add(fill);
 
@@ -300,10 +290,6 @@ export function startHero(section: HTMLElement): () => void {
   const wMat = water.material as THREE.ShaderMaterial;
   wMat.uniforms.uTexel.value.copy(texel);
   wMat.uniforms.uSunDir.value.copy(sunDir);
-  wMat.uniforms.uDeep.value.set(palette.water);
-  wMat.uniforms.uNear.value.set(palette.near);
-  wMat.uniforms.uSunColor.value.set(palette.sun);
-  wMat.uniforms.uFog.value.set(palette.horizon);
   scene.add(water);
 
   // ───── the cairn ─────
@@ -389,12 +375,13 @@ export function startHero(section: HTMLElement): () => void {
     height = stage.clientHeight;
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
-    const wide = camera.aspect > 1.05;
+    // same breakpoint as the CSS: beside the headline on desktops, above it on phones and tablets
+    const wide = width > 980 && camera.aspect > 0.8;
     camera.fov = wide ? 34 : 40;
     camera.clearViewOffset();
     if (wide) {
       // beside the headline: slide the picture sideways with a view offset
-      view.shift = THREE.MathUtils.clamp((camera.aspect - 1) * 0.6, 0.16, 0.26);
+      view.shift = THREE.MathUtils.clamp((camera.aspect - 0.8) * 0.4, 0.16, 0.26);
       view.camZ = THREE.MathUtils.clamp(7.4 + (1.6 - camera.aspect) * 3, 7.4, 8.6);
       view.camY = 1.1;
       view.lookY = 0.62;
@@ -410,7 +397,8 @@ export function startHero(section: HTMLElement): () => void {
       const free = bottom - top;
       const tan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
       // the cairn is about 3 units wide (with its pebbles) and 1.3 tall above the water
-      const dist = Math.max((3.1 * height) / (0.86 * width * 2 * tan), (1.3 * height) / (0.8 * free * 2 * tan), 6);
+      const targetW = Math.min(0.86 * width, Math.max(420, width * 0.55)); // phones: nearly full width; tablets: about half
+      const dist = Math.max((3.1 * height) / (targetW * 2 * tan), (1.3 * height) / (0.8 * free * 2 * tan), 6);
       view.shift = 0;
       view.camZ = dist;
       view.camY = 0.75 + dist * 0.07;

@@ -23,14 +23,6 @@ While the site is under review, every page has `<meta name="robots" content="noi
 
 `dist/` is plain HTML, CSS and JS, so any static host works.
 
-## Comparing the two looks
-
-The site has two colour directions:
-- **Warm** (default): sand, clay and olive.
-- **Dark & Gold**: the brand concept's deep aubergine and champagne gold.
-
-To preview one, open any page with `?look=gold` or `?look=warm`, for example https://evoryder8-collab.github.io/timeless-spa-website/?look=gold. The choice is kept for the browser session, and a small switch (top right) flips between the two. All the Dark & Gold rules are at the end of `src/styles/global.css`, plus the palettes in `src/scripts/hero.ts` and `src/scripts/map.ts`. Once a look is chosen, the other one and the switch can be removed.
-
 ## Before going live
 
 These are placeholders and must be replaced:
@@ -76,7 +68,7 @@ All copy is a draft for the spa to review.
 - **Hero:** the water is a GPU ripple simulation drawn with a planar reflection. The pointer makes ripples, and a click or tap makes a bigger drop. Scrolling lifts the camera and drifts the stones apart. Rendering stops when the hero is off screen.
 - **Travelling stone:** the cairn's top stone lifts off when you scroll past the hero. It rests on elements marked `data-stone-spot="top-left|top-right"`, moves to cards marked `data-stone-hover` and glows on `data-warm` cards. Its layer survives page changes (Astro `transition:persist`), so it follows the visitor from page to page. Clicking it makes it wobble.
 - **Sound:** generated in the browser with Web Audio, so there are no audio files. It is off until the visitor chooses it. The header switch turns it on and off, and the choice is kept for the session.
-- **Map:** a spinning NASA Blue Marble Earth (from `src/assets/earth/`, drawn by `src/scripts/globe.ts`) is there straight away. Nothing third-party loads until "Zum Timeless Spa fliegen" (fly to Timeless Spa) or the globe is tapped. Then MapLibre takes over at the same size, using NASA Blue Marble imagery on MapLibre's globe with an atmosphere and a starfield. It turns to Europe and dives down to the spa. Around zoom 7–9 the satellite picture hands over to OpenFreeMap streets, recoloured in the brand palette with warm 3D buildings.
+- **Map:** a spinning NASA Blue Marble Earth (from `src/assets/earth/`, drawn by `src/scripts/globe.ts`) is there straight away. Nothing third-party loads until "Zum Timeless Spa fliegen" (fly to Timeless Spa) or the globe is tapped. Then MapLibre takes over at the same size, using NASA Blue Marble imagery on its own globe with an atmosphere and a starfield, and dives down to the spa. Around zoom 7–9 the satellite picture hands over to OpenFreeMap streets, recoloured in the brand palette with warm 3D buildings.
 - **On phones:**
   - Ripples follow each finger on the water, even while it scrolls the page.
   - Tilting the phone moves the camera around the cairn and tilts the voucher card. iOS asks for motion access once, when the visitor enters the site.
