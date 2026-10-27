@@ -4,9 +4,12 @@ import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
 import { ui } from '../i18n/ui';
+import { href } from '../i18n/routes';
+import { brand, pillars } from '../data/brand';
 import type { Lang } from '../data/site';
 import heroPhoto from '../assets/photos/spa-room.jpg';
-import oil from '../assets/photos/amber-oil-bottle.jpg';
+import herbs from '../assets/photos/herbal-bundles.jpg';
+import oilJar from '../assets/photos/oil-jar-linen.jpg';
 import candles from '../assets/photos/candles.jpg';
 import towels from '../assets/photos/towels-candles.jpg';
 
@@ -14,88 +17,104 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = ui[lang];
 
-// PLACEHOLDER: the story and the team are draft copy until Timeless Spa provides the real details.
+// Vision, philosophy and Botanicals follow the client's concept document. The team is a placeholder.
 const copy = {
   de: {
     title: 'Über uns',
-    description: 'Timeless Spa in Köln-Ehrenfeld: ein ruhiger Ort für Massagen, an dem Zeit keine Rolle spielt.',
+    description: 'Timeless Spa vereint thailändische Gastfreundschaft und Behandlungskunst mit deutscher Qualität, Präzision und Hygiene. Vision, Philosophie und Timeless Organic Botanicals.',
     eyebrow: 'Über uns',
-    h1: 'Ein Ort, an dem <em>niemand drängt</em>.',
-    lead: 'Timeless Spa ist aus einer einfachen Idee entstanden: Eine gute Massage braucht Zeit, Ruhe und Hände, die zuhören.',
-    photoAlt: 'Behandlungsraum mit Massageliege in warmem Licht',
-    valuesEyebrow: 'Was uns wichtig ist',
-    valuesTitle: 'Drei Dinge, die Sie <em>spüren</em> werden.',
-    values: [
-      ['hourglass', 'Zeit', 'Wir planen Termine mit Luft dazwischen. So beginnt Ihre Massage pünktlich und endet nicht mit einem Blick auf die Uhr.'],
-      ['hands', 'Handwerk', 'Jede Massage wird an Sie angepasst: an Ihren Körper, Ihren Tag und an das, was Ihnen guttut.'],
-      ['leaf', 'Ruhe', 'Gedämpftes Licht, warme Tücher, kein Lärm. Ein Raum, in dem der Kopf leiser wird.'],
+    h1: 'Thailändisches Herz, <em>deutsche</em> Sorgfalt.',
+    lead: 'Timeless Spa ist ein exklusives Wellness- und Ausbildungskonzept: die herzliche Gastfreundschaft und die traditionellen Behandlungstechniken Thailands, verbunden mit deutscher Qualität, Präzision, Hygiene und Professionalität.',
+    photoAlt: 'Behandlungsraum mit Liege in warmem Licht',
+    visionEyebrow: 'Unsere Vision',
+    visionTitle: 'Eine Premium-Wellnessmarke mit <em>Tradition</em>.',
+    vision: 'Timeless Spa soll sich als Premium-Wellnessmarke etablieren, die traditionelle Kultur, natürliche Pflege und moderne Spa-Standards vereint: mit exklusiven Behandlungen, eigenen Produktkonzepten und einer professionellen Spa Academy.',
+    academyLink: 'Zur Spa Academy',
+    philEyebrow: 'Unsere Philosophie',
+    botEyebrow: 'Timeless Organic Botanicals',
+    botTitle: 'Natürlich, aus <em>Tradition</em>.',
+    botText: [
+      'Eigene, frisch zubereitete Kräuteraufgüsse und ausgewählte natürliche Pflegeprodukte, inspiriert von thailändischen und deutschen Pflanzentraditionen: Butterfly Pea und Kokos ebenso wie Birke, Brennnessel und Kamille.',
+      'Statt pauschal etwas zu versprechen, arbeiten wir mit ausgewählten natürlichen Inhaltsstoffen und transparenten Rezepturen. Auch Naturprodukte können Allergien auslösen. Sagen Sie uns deshalb vorab, worauf Sie empfindlich reagieren. Unsere selbst hergestellten Produkte unterliegen sorgfältiger Hygiene und Haltbarkeitskontrolle.',
     ],
-    spaceEyebrow: 'Der Raum',
-    spaceTitle: 'Warm, schlicht, <em>still</em>.',
-    spaceText: 'Natürliche Farben, weiche Stoffe und warmes Licht. Wir haben den Raum so eingerichtet, dass Sie sich vom ersten Moment an fallen lassen können.',
     teamEyebrow: 'Das Team',
     teamTitle: 'Die Hände hinter <em>Timeless</em>.',
     teamText: 'Hier stellen wir bald unser Team vor.',
     member: 'Name folgt',
-    role: 'Massagetherapeut:in',
+    role: 'Spa-Therapeut:in',
   },
   en: {
     title: 'About us',
-    description: 'Timeless Spa in Cologne-Ehrenfeld: a calm place for massage where time does not matter.',
+    description: 'Timeless Spa brings together Thai hospitality and the art of touch with German quality, precision and hygiene. Our vision, philosophy and Timeless Organic Botanicals.',
     eyebrow: 'About us',
-    h1: 'A place where <em>no one rushes you</em>.',
-    lead: 'Timeless Spa grew out of a simple idea: a good massage needs time, calm and hands that listen.',
-    photoAlt: 'Treatment room with a massage table in warm light',
-    valuesEyebrow: 'What matters to us',
-    valuesTitle: 'Three things you will <em>feel</em>.',
-    values: [
-      ['hourglass', 'Time', 'We plan appointments with space in between, so your massage starts on time and never ends with a glance at the clock.'],
-      ['hands', 'Craft', 'Every massage is shaped around you: your body, your day and what feels good to you.'],
-      ['leaf', 'Calm', 'Soft light, warm towels, no noise. A room where your mind gets quieter.'],
+    h1: 'A Thai heart, <em>German</em> care.',
+    lead: 'Timeless Spa is an exclusive wellness and training concept: the warm hospitality and traditional treatment techniques of Thailand, combined with German quality, precision, hygiene and professionalism.',
+    photoAlt: 'Treatment room with a table in warm light',
+    visionEyebrow: 'Our vision',
+    visionTitle: 'A premium wellness brand rooted in <em>tradition</em>.',
+    vision: 'Timeless Spa aims to become a premium wellness brand that unites traditional culture, natural care and modern spa standards, with exclusive treatments, its own product concepts and a professional Spa Academy.',
+    academyLink: 'To the Spa Academy',
+    philEyebrow: 'Our philosophy',
+    botEyebrow: 'Timeless Organic Botanicals',
+    botTitle: 'Natural, by <em>tradition</em>.',
+    botText: [
+      'Our own freshly prepared herbal infusions and selected natural care products, inspired by Thai and German plant traditions: butterfly pea and coconut as well as birch, nettle and chamomile.',
+      'Rather than making sweeping promises, we work with carefully selected natural ingredients and transparent recipes. Natural products can cause allergies too, so please tell us beforehand what you are sensitive to. The products we make ourselves are subject to careful hygiene and shelf-life checks.',
     ],
-    spaceEyebrow: 'The space',
-    spaceTitle: 'Warm, simple, <em>still</em>.',
-    spaceText: 'Natural colours, soft fabrics and warm light. We set up the room so you can let go from the very first moment.',
     teamEyebrow: 'The team',
     teamTitle: 'The hands behind <em>Timeless</em>.',
     teamText: 'We will introduce our team here soon.',
     member: 'Name to follow',
-    role: 'Massage therapist',
+    role: 'Spa therapist',
   },
 }[lang];
 ---
 <Base lang={lang} page="about" title={copy.title} description={copy.description}>
   <PageHero eyebrow={copy.eyebrow} title={copy.h1} lead={copy.lead} photo={heroPhoto} photoAlt={copy.photoAlt} />
 
-  <section class="section values">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow" data-reveal="rise">{copy.valuesEyebrow}</p>
-        <h2 data-reveal="words" set:html={copy.valuesTitle} />
+  <section class="section vision">
+    <div class="wrap vision__grid">
+      <div>
+        <p class="eyebrow" data-reveal="rise">{copy.visionEyebrow}</p>
+        <h2 data-reveal="words" set:html={copy.visionTitle} />
       </div>
-      <ul class="values__list" data-reveal="stagger">
-        {copy.values.map(([icon, title, text]) => (
-          <li data-reveal-item>
-            <span class="values__icon"><Icon name={icon as 'leaf'} /></span>
-            <h3>{title}</h3>
-            <p>{text}</p>
-          </li>
-        ))}
-      </ul>
+      <div data-reveal="rise">
+        <p class="lead">{copy.vision}</p>
+        <a class="link-arrow" href={href('academy', lang)} data-sfx="click">{copy.academyLink}<Icon name="arrow" /></a>
+      </div>
     </div>
   </section>
 
-  <section class="section section--linen space">
+  <section class="section philosophy">
+    <div class="wrap">
+      <p class="eyebrow" data-reveal="rise">{copy.philEyebrow}</p>
+      <h2 class="philosophy__claim" data-reveal="words" set:html={brand.claim[lang]} />
+      <ul class="philosophy__pillars" data-reveal="stagger">
+        {pillars.map((p, i) => (
+          <li data-reveal-item>
+            <span class="philosophy__num">0{i + 1}</span>
+            <h3>{p.title}</h3>
+            <p>{p.text[lang]}</p>
+          </li>
+        ))}
+      </ul>
+      <p class="philosophy__promise" data-reveal="words">{brand.promise[lang]}</p>
+    </div>
+  </section>
+
+  <section class="section section--linen space" id="botanicals">
     <div class="wrap space__grid">
       <div class="space__text">
-        <p class="eyebrow" data-reveal="rise">{copy.spaceEyebrow}</p>
-        <h2 data-reveal="words" set:html={copy.spaceTitle} />
-        <p class="lead" data-reveal="rise">{copy.spaceText}</p>
+        <p class="eyebrow" data-reveal="rise">{copy.botEyebrow}</p>
+        <h2 data-reveal="words" set:html={copy.botTitle} />
+        <div data-reveal="rise">
+          {copy.botText.map((p) => <p class="lead">{p}</p>)}
+        </div>
       </div>
       <div class="space__photos">
-        <div class="photo space__a" data-reveal="ripple" data-stone-spot="top-right"><Image src={towels} alt="" widths={[480, 900]} sizes="(max-width: 900px) 100vw, 34vw" /></div>
-        <div class="photo space__b" data-reveal="ripple"><Image src={candles} alt="" widths={[400, 700]} sizes="(max-width: 900px) 50vw, 22vw" /></div>
-        <div class="photo space__c" data-reveal="ripple"><Image src={oil} alt="" widths={[400, 700]} sizes="(max-width: 900px) 50vw, 22vw" /></div>
+        <div class="photo space__a" data-reveal="ripple" data-stone-spot="top-right"><Image src={herbs} alt="" widths={[480, 900]} sizes="(max-width: 900px) 100vw, 34vw" /></div>
+        <div class="photo space__b" data-reveal="ripple"><Image src={oilJar} alt="" widths={[400, 700]} sizes="(max-width: 900px) 50vw, 22vw" /></div>
+        <div class="photo space__c" data-reveal="ripple"><Image src={candles} alt="" widths={[400, 700]} sizes="(max-width: 900px) 50vw, 22vw" /></div>
       </div>
     </div>
   </section>
@@ -126,24 +145,24 @@ const copy = {
 </Base>
 
 <style>
-  .values__list { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 3vw, 40px); margin: 0; padding: 0; list-style: none; }
-  .values__list li { padding: 34px; border-radius: var(--radius); background: var(--linen); }
-  .values__icon {
-    display: grid;
-    place-items: center;
-    width: 58px;
-    height: 58px;
-    margin-bottom: 28px;
-    border-radius: 50%;
-    background: var(--sand);
-    color: var(--clay-deep);
-  }
-  .values__icon :global(svg) { width: 26px; height: 26px; }
-  .values__list h3 { margin-bottom: 12px; }
-  .values__list p { margin: 0; color: var(--muted); }
+  .vision__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 90px); align-items: end; }
+  .vision .lead { margin-bottom: 24px; }
 
-  .space__grid { display: grid; grid-template-columns: 0.9fr 1.2fr; gap: clamp(40px, 6vw, 90px); align-items: center; }
+  .philosophy { background: var(--aubergine); color: rgb(246 241 234 / 0.82); }
+  .philosophy .eyebrow { color: var(--gold); }
+  .philosophy__claim { max-width: 15ch; color: var(--gold); font-size: clamp(2.3rem, 5vw, 4.4rem); }
+  .philosophy__claim :global(em) { color: var(--linen); }
+  .philosophy__pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 4vw, 56px); margin: clamp(48px, 7vw, 90px) 0 0; padding: 0; list-style: none; }
+  .philosophy__pillars li { padding-top: 26px; border-top: 1px solid rgb(201 178 127 / 0.35); }
+  .philosophy__num { display: block; margin-bottom: 22px; font-family: var(--serif); font-style: italic; font-size: 2.6rem; font-weight: 300; line-height: 1; color: var(--gold); }
+  .philosophy__pillars h3 { margin-bottom: 12px; color: var(--linen); }
+  .philosophy__pillars p { margin: 0; }
+  .philosophy__promise { max-width: 26em; margin: clamp(56px, 8vw, 100px) 0 0; font-family: var(--serif); font-style: italic; font-size: clamp(1.4rem, 2.6vw, 2.1rem); line-height: 1.3; color: var(--gold); }
+
+  .space { scroll-margin-top: var(--header-h); }
+  .space__grid { display: grid; grid-template-columns: 0.95fr 1.15fr; gap: clamp(40px, 6vw, 90px); align-items: center; }
   .space h2 { margin-bottom: 26px; }
+  .space .lead { font-size: 1.08rem; }
   .space__photos { display: grid; grid-template-columns: 1.3fr 1fr; grid-template-rows: 1fr 1fr; gap: 14px; aspect-ratio: 1.15; }
   .space__a { grid-row: 1 / 3; }
 
@@ -162,8 +181,7 @@ const copy = {
   .team__cta { display: flex; justify-content: center; margin-top: 40px; }
 
   @media (max-width: 900px) {
-    .values__list, .team__list { grid-template-columns: 1fr; }
-    .space__grid { grid-template-columns: 1fr; }
+    .vision__grid, .space__grid, .philosophy__pillars { grid-template-columns: 1fr; }
     .team__list { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 520px) { .team__list { grid-template-columns: 1fr; } }

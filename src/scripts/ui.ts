@@ -144,7 +144,7 @@ export function initPage({ lenis }: { lenis: Lenis | null }) {
         const f = btn.dataset.filter!;
         filters.querySelectorAll('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
         sound.click();
-        const show = items.filter((it) => f === 'all' || it.querySelector('[data-focus]')!.getAttribute('data-focus')!.split(' ').includes(f));
+        const show = items.filter((it) => f === 'all' || it.querySelector('[data-world]')!.getAttribute('data-world') === f);
         items.forEach((it) => it.classList.toggle('is-hidden', !show.includes(it)));
         gsap.fromTo(show, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, stagger: 0.05, ease: 'power3.out', clearProps: 'all' });
         lenis?.resize();

@@ -2,7 +2,7 @@
 
 export const ui = {
   de: {
-    nav: { home: 'Start', massages: 'Massagen & Preise', about: 'Über uns', vouchers: 'Gutscheine', contact: 'Kontakt', imprint: 'Impressum', privacy: 'Datenschutz' },
+    nav: { home: 'Start', massages: 'Behandlungen & Preise', academy: 'Spa Academy', about: 'Über uns', vouchers: 'Gutscheine', contact: 'Kontakt', imprint: 'Impressum', privacy: 'Datenschutz' },
     book: 'Termin buchen',
     menu: 'Menü',
     close: 'Schließen',
@@ -24,12 +24,12 @@ export const ui = {
     closed: 'Geschlossen',
     today: 'Heute',
     address: 'Adresse',
-    footer: { tagline: 'Massagen in Köln-Ehrenfeld.', explore: 'Entdecken', contact: 'Kontakt', legal: 'Rechtliches' },
+    footer: { tagline: 'Thailändische Spa-Tradition und deutsche Qualität in Köln-Ehrenfeld.', explore: 'Entdecken', contact: 'Kontakt', legal: 'Rechtliches' },
     minutes: 'Min.',
     from: 'ab',
   },
   en: {
-    nav: { home: 'Home', massages: 'Massages & Prices', about: 'About us', vouchers: 'Gift vouchers', contact: 'Contact', imprint: 'Imprint', privacy: 'Privacy' },
+    nav: { home: 'Home', massages: 'Treatments & Prices', academy: 'Spa Academy', about: 'About us', vouchers: 'Gift vouchers', contact: 'Contact', imprint: 'Imprint', privacy: 'Privacy' },
     book: 'Book an appointment',
     menu: 'Menu',
     close: 'Close',
@@ -51,7 +51,7 @@ export const ui = {
     closed: 'Closed',
     today: 'Today',
     address: 'Address',
-    footer: { tagline: 'Massage in Cologne-Ehrenfeld.', explore: 'Explore', contact: 'Contact', legal: 'Legal' },
+    footer: { tagline: 'Thai spa traditions and German quality in Cologne-Ehrenfeld.', explore: 'Explore', contact: 'Contact', legal: 'Legal' },
     minutes: 'min',
     from: 'from',
   },

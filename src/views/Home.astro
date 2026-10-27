@@ -6,9 +6,9 @@ import Hours from '../components/Hours.astro';
 import VoucherCard from '../components/VoucherCard.astro';
 import { ui } from '../i18n/ui';
 import { href } from '../i18n/routes';
-import { massages, euro, fromPrice } from '../data/massages';
+import { brand, pillars, experienceWorlds } from '../data/brand';
 import { site, type Lang } from '../data/site';
-import heroFallback from '../assets/photos/hot-stones-back.jpg';
+import heroFallback from '../assets/photos/herbal-compress-back.jpg';
 import welcomePhoto from '../assets/photos/back-massage-warm.jpg';
 import placePhoto from '../assets/photos/towels-candles.jpg';
 
@@ -18,82 +18,64 @@ const t = ui[lang];
 
 const copy = {
   de: {
-    title: 'Timeless Spa · Massagen in Köln-Ehrenfeld',
-    description: 'Timeless Spa am Melatengürtel in Köln-Ehrenfeld: klassische Massage, Hot Stone, Thai-Massage und lange Rituale. Termin per Telefon, WhatsApp oder E-Mail.',
-    eyebrow: 'Massage · Köln-Ehrenfeld',
-    h1: 'Hier steht die <em>Zeit</em> still.',
-    lead: 'Massagen, die Ihnen Zeit zurückgeben. Mitten in Ehrenfeld, am Melatengürtel.',
-    explore: 'Massagen entdecken',
+    title: 'Timeless Spa · Thai Heart. German Quality. · Köln-Ehrenfeld',
+    description: 'Timeless Spa in Köln-Ehrenfeld: thailändische Heiltradition und deutsche Qualitätsstandards. Head Spa, Hand & Foot Spa, Signature-Massagen, Pregnancy Spa und die Timeless Spa Academy.',
+    lead: `${brand.journey.de} Mitten in Köln-Ehrenfeld.`,
+    explore: 'Erlebniswelten entdecken',
     touch: 'Berühren Sie das Wasser',
     scroll: 'Scrollen',
-    welcomeEyebrow: 'Willkommen',
-    welcomeTitle: 'Eine Stunde, die sich wie ein <em>ganzer Tag</em> anfühlt.',
-    welcomeText: [
-      'Draußen rauscht der Gürtel, drinnen wird es still. Bei Timeless Spa nehmen wir uns Zeit: für ein kurzes Gespräch vor der Massage, für warme Hände und für den Moment danach, in dem Sie nicht sofort wieder losmüssen.',
-      'Ob Sie Verspannungen loswerden oder einfach eine Stunde nichts tun möchten, wir passen jede Massage an Sie an.',
+    conceptEyebrow: 'Unser Konzept',
+    conceptTitle: 'Ein Erlebnis, das in <em>Erinnerung</em> bleibt.',
+    conceptText: [
+      'Timeless Spa ist ein exklusives Wellness- und Ausbildungskonzept, das die herzliche Gastfreundschaft und die traditionellen Behandlungstechniken Thailands mit deutscher Qualität, Präzision, Hygiene und Professionalität verbindet.',
+      'Unser Ziel ist es, nicht einfach eine Behandlung anzubieten, sondern ein Erlebnis zu schaffen, das in Erinnerung bleibt.',
     ],
     about: 'Über uns',
-    sigEyebrow: 'Lieblingsmassagen',
-    sigTitle: 'Drei Wege, die Uhr <em>anzuhalten</em>.',
-    sigAll: 'Alle Massagen & Preise',
-    visitEyebrow: 'Ihr Besuch',
-    visitTitle: 'So einfach <em>kommen Sie an</em>.',
-    steps: [
-      ['Termin anfragen', 'Per Telefon, WhatsApp oder E-Mail. Wir finden gemeinsam einen Termin, der passt.'],
-      ['Ankommen', 'Kommen Sie ein paar Minuten früher, damit Sie in Ruhe ankommen und erzählen können, was Ihnen guttut.'],
-      ['Zeit vergessen', 'Den Rest übernehmen wir. Sie müssen nur liegen und atmen.'],
-    ],
+    philEyebrow: 'Unsere Philosophie',
+    worldsEyebrow: 'Unsere Erlebniswelten',
+    worldsTitle: 'Sechs Wege, die Zeit <em>anzuhalten</em>.',
+    worldsAll: 'Alle Behandlungen & Preise',
+    discover: 'Entdecken',
     voucherEyebrow: 'Gutscheine',
     voucherTitle: 'Verschenken Sie <em>Zeit</em>.',
-    voucherText: 'Ein Gutschein über einen Wunschbetrag oder eine bestimmte Massage. Erhältlich vor Ort, per Telefon oder per WhatsApp.',
+    voucherText: 'Ein Gutschein über einen Wunschbetrag oder eine bestimmte Behandlung, etwa ein Head Spa Ritual. Erhältlich vor Ort, per Telefon oder per WhatsApp.',
     voucherCta: 'Mehr zu Gutscheinen',
     findEyebrow: 'Hier finden Sie uns',
     findTitle: 'Am Melatengürtel, <em>mitten in Ehrenfeld</em>.',
     findCta: 'Anfahrt & Kontakt',
-    endTitle: 'Bereit für eine <em>Pause</em>?',
     endText: 'Rufen Sie an oder schreiben Sie uns. Wir freuen uns auf Sie.',
-    minutesFrom: (min: number, price: string) => `${min} Min. · ab ${price}`,
   },
   en: {
-    title: 'Timeless Spa · Massage in Cologne-Ehrenfeld',
-    description: 'Timeless Spa on the Melatengürtel in Cologne-Ehrenfeld: classic massage, hot stone, Thai massage and long rituals. Book by phone, WhatsApp or email.',
-    eyebrow: 'Massage · Cologne-Ehrenfeld',
-    h1: 'Where <em>time</em> stands still.',
-    lead: 'Massages that give you back your time. In the heart of Ehrenfeld, on the Melatengürtel.',
-    explore: 'Explore massages',
+    title: 'Timeless Spa · Thai Heart. German Quality. · Cologne-Ehrenfeld',
+    description: 'Timeless Spa in Cologne-Ehrenfeld: Thai healing traditions and German quality standards. Head Spa, Hand & Foot Spa, signature massages, pregnancy spa and the Timeless Spa Academy.',
+    lead: `${brand.journey.en} In the heart of Cologne-Ehrenfeld.`,
+    explore: 'Explore our worlds',
     touch: 'Touch the water',
     scroll: 'Scroll',
-    welcomeEyebrow: 'Welcome',
-    welcomeTitle: 'An hour that feels like <em>a whole day</em>.',
-    welcomeText: [
-      'Outside, the ring road hums. Inside, it goes quiet. At Timeless Spa we take our time: for a short chat before your massage, for warm hands, and for the moment afterwards when you don’t have to rush off.',
-      'Whether you want to work out some knots or simply do nothing for an hour, we shape every massage around you.',
+    conceptEyebrow: 'Our concept',
+    conceptTitle: 'An experience that <em>stays with you</em>.',
+    conceptText: [
+      'Timeless Spa is an exclusive wellness and training concept that brings together the warm hospitality and traditional treatment techniques of Thailand with German quality, precision, hygiene and professionalism.',
+      'Our aim is not simply to offer a treatment, but to create an experience you will remember.',
     ],
     about: 'About us',
-    sigEyebrow: 'Signature massages',
-    sigTitle: 'Three ways to <em>stop the clock</em>.',
-    sigAll: 'All massages & prices',
-    visitEyebrow: 'Your visit',
-    visitTitle: 'Arriving is <em>easy</em>.',
-    steps: [
-      ['Ask for a time', 'By phone, WhatsApp or email. Together we find a time that suits you.'],
-      ['Arrive', 'Come a few minutes early so you can settle in and tell us what feels good to you.'],
-      ['Forget the time', 'We take care of the rest. All you have to do is lie down and breathe.'],
-    ],
+    philEyebrow: 'Our philosophy',
+    worldsEyebrow: 'Our experience worlds',
+    worldsTitle: 'Six ways to <em>stop the clock</em>.',
+    worldsAll: 'All treatments & prices',
+    discover: 'Discover',
     voucherEyebrow: 'Gift vouchers',
     voucherTitle: 'Give the gift of <em>time</em>.',
-    voucherText: 'A voucher for any amount or for a specific massage. Available in person, by phone or on WhatsApp.',
+    voucherText: 'A voucher for any amount or for a specific treatment, such as a Head Spa ritual. Available in person, by phone or on WhatsApp.',
     voucherCta: 'More about vouchers',
     findEyebrow: 'Find us',
     findTitle: 'On the Melatengürtel, <em>in the heart of Ehrenfeld</em>.',
     findCta: 'Directions & contact',
-    endTitle: 'Ready for a <em>pause</em>?',
     endText: 'Call us or send us a message. We look forward to seeing you.',
-    minutesFrom: (min: number, price: string) => `${min} min · from ${price}`,
   },
 }[lang];
 
-const signature = massages.filter((m) => m.signature);
+const worldHref = (w: (typeof experienceWorlds)[number]) => href(w.page, lang) + (w.hash ? `#${w.hash}` : '');
 ---
 <Base lang={lang} page="home" title={copy.title} description={copy.description}>
   <section class="hero" data-hero>
@@ -102,8 +84,8 @@ const signature = massages.filter((m) => m.signature);
     </div>
     <div class="hero__veil" aria-hidden="true"></div>
     <div class="wrap hero__content">
-      <p class="eyebrow" data-reveal="rise">{copy.eyebrow}</p>
-      <h1 data-reveal="words" set:html={copy.h1} />
+      <p class="eyebrow" data-reveal="rise">{brand.tagline}</p>
+      <h1 data-reveal="words" set:html={brand.claim[lang]} />
       <p class="lead" data-reveal="rise">{copy.lead}</p>
       <div class="hero__ctas" data-reveal="rise">
         <button class="btn" type="button" data-book data-sfx="bowl">{t.book}</button>
@@ -117,10 +99,10 @@ const signature = massages.filter((m) => m.signature);
   <section class="section welcome">
     <div class="wrap welcome__grid">
       <div class="welcome__text">
-        <p class="eyebrow" data-reveal="rise">{copy.welcomeEyebrow}</p>
-        <h2 data-reveal="words" set:html={copy.welcomeTitle} />
+        <p class="eyebrow" data-reveal="rise">{copy.conceptEyebrow}</p>
+        <h2 data-reveal="words" set:html={copy.conceptTitle} />
         <div data-reveal="rise">
-          {copy.welcomeText.map((p) => <p class="lead">{p}</p>)}
+          {copy.conceptText.map((p) => <p class="lead">{p}</p>)}
           <a class="link-arrow" href={href('about', lang)} data-sfx="click">{copy.about}<Icon name="arrow" /></a>
         </div>
       </div>
@@ -130,47 +112,47 @@ const signature = massages.filter((m) => m.signature);
     </div>
   </section>
 
+  <section class="section philosophy">
+    <div class="wrap">
+      <p class="eyebrow" data-reveal="rise">{copy.philEyebrow}</p>
+      <h2 class="philosophy__claim" data-reveal="words" set:html={brand.claim[lang]} />
+      <ul class="philosophy__pillars" data-reveal="stagger">
+        {pillars.map((p, i) => (
+          <li data-reveal-item>
+            <span class="philosophy__num">0{i + 1}</span>
+            <h3>{p.title}</h3>
+            <p>{p.text[lang]}</p>
+          </li>
+        ))}
+      </ul>
+      <p class="philosophy__promise" data-reveal="words">{brand.promise[lang]}</p>
+    </div>
+  </section>
+
   <section class="section section--linen signature">
     <div class="wrap">
       <div class="section-head">
-        <p class="eyebrow" data-reveal="rise">{copy.sigEyebrow}</p>
-        <h2 data-reveal="words" set:html={copy.sigTitle} />
+        <p class="eyebrow" data-reveal="rise">{copy.worldsEyebrow}</p>
+        <h2 data-reveal="words" set:html={copy.worldsTitle} />
       </div>
       <div class="signature__grid" data-reveal="stagger" data-carousel>
-        {signature.map((m) => (
-          <a class="sig" href={`${href('massages', lang)}#${m.id}`} data-stone-hover data-warm={m.warm ? '' : undefined} data-sfx="click" data-reveal-item>
+        {experienceWorlds.map((w, i) => (
+          <a class="sig" href={worldHref(w)} data-stone-hover data-warm={w.warm ? '' : undefined} data-sfx="click" data-reveal-item>
             <div class="sig__photo">
-              {m.photo && <Image src={m.photo} alt="" widths={[400, 700]} sizes="(max-width: 800px) 100vw, 30vw" />}
+              <Image src={w.photo} alt="" widths={[400, 700]} sizes="(max-width: 800px) 80vw, 30vw" />
+              <span class="sig__num">{i + 1}</span>
             </div>
             <div class="sig__body">
-              <h3>{m.name[lang]}</h3>
-              <p>{m.text[lang]}</p>
-              <span class="sig__meta">{copy.minutesFrom(Math.min(...m.options.map((o) => o.minutes)), euro(fromPrice(m), lang))}<Icon name="arrow" /></span>
+              <h3>{w.name[lang]}</h3>
+              <p>{w.text[lang]}</p>
+              <span class="sig__meta">{copy.discover}<Icon name="arrow" /></span>
             </div>
           </a>
         ))}
       </div>
       <div class="signature__all" data-reveal="rise">
-        <a class="btn btn--ghost" href={href('massages', lang)} data-sfx="click">{copy.sigAll}<Icon name="arrow" /></a>
+        <a class="btn btn--ghost" href={href('massages', lang)} data-sfx="click">{copy.worldsAll}<Icon name="arrow" /></a>
       </div>
-    </div>
-  </section>
-
-  <section class="section visit">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow" data-reveal="rise">{copy.visitEyebrow}</p>
-        <h2 data-reveal="words" set:html={copy.visitTitle} />
-      </div>
-      <ol class="visit__steps" data-reveal="stagger">
-        {copy.steps.map(([title, text], i) => (
-          <li data-reveal-item>
-            <span class="visit__num">0{i + 1}</span>
-            <h3>{title}</h3>
-            <p>{text}</p>
-          </li>
-        ))}
-      </ol>
     </div>
   </section>
 
@@ -209,7 +191,7 @@ const signature = massages.filter((m) => m.signature);
 
   <section class="section section--linen end">
     <div class="wrap end__inner">
-      <h2 data-reveal="words" set:html={copy.endTitle} />
+      <h2 data-reveal="words">{brand.promise[lang]}</h2>
       <p class="lead" data-reveal="rise">{copy.endText}</p>
       <div class="end__ctas" data-reveal="rise">
         <button class="btn" type="button" data-book data-sfx="bowl">{t.book}</button>
@@ -261,7 +243,7 @@ const signature = massages.filter((m) => m.signature);
     pointer-events: none;
   }
   .hero__content > * { pointer-events: auto; }
-  .hero h1 { max-width: 9.5ch; }
+  .hero h1 { max-width: 11ch; font-size: clamp(2.6rem, 6.2vw, 5.8rem); }
   .hero .lead { margin-top: 26px; max-width: 26em; color: var(--espresso-2); }
   .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
   .hero__touch {
@@ -350,7 +332,18 @@ const signature = massages.filter((m) => m.signature);
     transition: transform 0.8s var(--ease), box-shadow 0.8s var(--ease);
   }
   .sig:hover { transform: translateY(-6px); box-shadow: 0 40px 70px -40px rgb(42 33 27 / 0.55); }
-  .sig__photo { aspect-ratio: 4 / 3; overflow: hidden; background: var(--sand-2); }
+  .sig__photo { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--sand-2); }
+  .sig__num {
+    position: absolute;
+    left: 16px;
+    top: 14px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 2.4rem;
+    line-height: 1;
+    color: var(--linen);
+    text-shadow: 0 2px 18px rgb(42 33 27 / 0.6);
+  }
   .sig__photo :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s var(--ease); }
   .sig:hover .sig__photo :global(img) { transform: scale(1.06); }
   .sig__body { display: flex; flex-direction: column; flex: 1; padding: 26px 26px 24px; }
@@ -370,21 +363,25 @@ const signature = massages.filter((m) => m.signature);
   .sig:hover .sig__meta :global(svg) { transform: translateX(5px); }
   .signature__all { margin-top: 44px; display: flex; justify-content: center; }
 
-  /* ───── visit ───── */
-  .visit__steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 4vw, 56px); margin: 0; padding: 0; list-style: none; }
-  .visit__steps li { padding-top: 26px; border-top: 1px solid var(--line); }
-  .visit__num {
-    display: block;
-    margin-bottom: 26px;
+  /* ───── philosophy: the concept's own colours, deep aubergine and champagne gold ───── */
+  .philosophy { background: var(--aubergine); color: rgb(246 241 234 / 0.82); }
+  .philosophy .eyebrow { color: var(--gold); }
+  .philosophy__claim { max-width: 15ch; color: var(--gold); font-size: clamp(2.3rem, 5vw, 4.4rem); }
+  .philosophy__claim :global(em) { color: var(--linen); }
+  .philosophy__pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 4vw, 56px); margin: clamp(48px, 7vw, 90px) 0 0; padding: 0; list-style: none; }
+  .philosophy__pillars li { padding-top: 26px; border-top: 1px solid rgb(201 178 127 / 0.35); }
+  .philosophy__num { display: block; margin-bottom: 22px; font-family: var(--serif); font-style: italic; font-size: 2.6rem; font-weight: 300; line-height: 1; color: var(--gold); }
+  .philosophy__pillars h3 { margin-bottom: 12px; color: var(--linen); }
+  .philosophy__pillars p { margin: 0; }
+  .philosophy__promise {
+    max-width: 26em;
+    margin: clamp(56px, 8vw, 100px) 0 0;
     font-family: var(--serif);
-    font-size: clamp(3rem, 6vw, 4.6rem);
     font-style: italic;
-    font-weight: 300;
-    line-height: 1;
-    color: var(--clay);
+    font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+    line-height: 1.3;
+    color: var(--gold);
   }
-  .visit__steps h3 { margin-bottom: 12px; }
-  .visit__steps p { color: var(--muted); }
 
   /* ───── voucher teaser ───── */
   .gift__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 7vw, 100px); align-items: center; }
@@ -402,14 +399,14 @@ const signature = massages.filter((m) => m.signature);
 
   /* ───── end ───── */
   .end__inner { display: grid; justify-items: center; text-align: center; }
-  .end h2 { max-width: 14ch; }
+  .end h2 { max-width: 18ch; }
   .end .lead { margin: 22px 0 34px; }
   .end__ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 
   @media (max-width: 900px) {
     .welcome__grid, .gift__grid, .find__grid { grid-template-columns: 1fr; }
     .welcome__photo, .find__photo { aspect-ratio: 4 / 3; }
-    .visit__steps { grid-template-columns: 1fr; }
+    .philosophy__pillars { grid-template-columns: 1fr; }
     /* phones: the signature massages become a swipeable row; the card in the middle comes forward */
     .signature__grid {
       display: flex;

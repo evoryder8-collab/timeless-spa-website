@@ -4,7 +4,7 @@ import PageHero from '../components/PageHero.astro';
 import MassageCard from '../components/MassageCard.astro';
 import Icon from '../components/Icon.astro';
 import { ui } from '../i18n/ui';
-import { massages, focusLabels, menuIsSample, type Focus } from '../data/massages';
+import { treatments, worldLabels, menuIsSample, type World } from '../data/treatments';
 import type { Lang } from '../data/site';
 
 interface Props { lang: Lang }
@@ -13,32 +13,32 @@ const t = ui[lang];
 
 const copy = {
   de: {
-    title: 'Massagen & Preise',
-    description: 'Alle Massagen von Timeless Spa in Köln-Ehrenfeld mit Dauer und Preisen: klassisch, Hot Stone, Aromaöl, Tiefengewebe, Thai, Kräuterstempel und Paarmassage.',
-    eyebrow: 'Massagen & Preise',
-    h1: 'Finden Sie Ihre <em>Massage</em>.',
-    lead: 'Jede Massage beginnt mit einem kurzen Gespräch, damit Druck, Öl und Schwerpunkt zu Ihnen passen. Nicht sicher, was Sie wählen sollen? Fragen Sie uns einfach bei der Buchung.',
-    filter: 'Nach Wirkung filtern',
-    sample: 'Beispielmenü: Massagen und Preise werden durch das echte Angebot ersetzt.',
-    vat: 'Alle Preise inkl. gesetzlicher MwSt.',
+    title: 'Behandlungen & Preise',
+    description: 'Head Spa, Hand & Foot Spa, Thai- und Kräuterstempelmassagen und die Pregnancy Herbal Spa Experience bei Timeless Spa in Köln-Ehrenfeld, mit Dauer und Preisen.',
+    eyebrow: 'Erlebniswelten',
+    h1: 'Jede Behandlung erzählt eine <em>Geschichte</em>.',
+    lead: 'Thailändische Berührungskunst, ausgewählte natürliche Inhaltsstoffe und transparente Rezepturen. Jede Behandlung beginnt mit einem kurzen Gespräch, damit sie zu Ihnen passt.',
+    filter: 'Nach Erlebniswelt filtern',
+    sample: 'Beispielpreise: Dauer und Preise werden durch das echte Angebot ersetzt.',
+    vat: 'Alle Preise inkl. gesetzlicher MwSt. Auch natürliche Inhaltsstoffe können Allergien auslösen: Bitte sagen Sie uns vorab, worauf Sie empfindlich reagieren.',
     unsureTitle: 'Noch unentschlossen?',
-    unsureText: 'Erzählen Sie uns, was Sie brauchen, und wir empfehlen Ihnen die passende Massage.',
+    unsureText: 'Erzählen Sie uns, was Sie brauchen, und wir empfehlen Ihnen die passende Behandlung.',
   },
   en: {
-    title: 'Massages & Prices',
-    description: 'All massages at Timeless Spa in Cologne-Ehrenfeld with durations and prices: classic, hot stone, aromatherapy, deep tissue, Thai, herbal compress and couples massage.',
-    eyebrow: 'Massages & Prices',
-    h1: 'Find your <em>massage</em>.',
-    lead: 'Every massage starts with a short chat so the pressure, oil and focus suit you. Not sure what to choose? Just ask us when you book.',
-    filter: 'Filter by effect',
-    sample: 'Sample menu: these massages and prices will be replaced with the real menu.',
-    vat: 'All prices include VAT.',
+    title: 'Treatments & Prices',
+    description: 'Head Spa, Hand & Foot Spa, Thai and herbal compress massages and the Pregnancy Herbal Spa Experience at Timeless Spa in Cologne-Ehrenfeld, with durations and prices.',
+    eyebrow: 'Experience worlds',
+    h1: 'Every treatment tells a <em>story</em>.',
+    lead: 'The Thai art of touch, carefully selected natural ingredients and transparent recipes. Every treatment starts with a short chat so it suits you.',
+    filter: 'Filter by experience world',
+    sample: 'Sample prices: durations and prices will be replaced with the real menu.',
+    vat: 'All prices include VAT. Natural ingredients can cause allergies too: please tell us beforehand what you are sensitive to.',
     unsureTitle: 'Still deciding?',
-    unsureText: 'Tell us what you need and we will recommend the right massage.',
+    unsureText: 'Tell us what you need and we will recommend the right treatment.',
   },
 }[lang];
 
-const filters: (Focus | 'all')[] = ['all', 'relax', 'deep', 'couples'];
+const filters: (World | 'all')[] = ['all', 'head', 'handfoot', 'massage', 'pregnancy'];
 ---
 <Base lang={lang} page="massages" title={copy.title} description={copy.description}>
   <PageHero eyebrow={copy.eyebrow} title={copy.h1} lead={copy.lead} />
@@ -48,11 +48,11 @@ const filters: (Focus | 'all')[] = ['all', 'relax', 'deep', 'couples'];
       {menuIsSample && <p class="menu__sample" role="note">{copy.sample}</p>}
       <div class="menu__filters" role="group" aria-label={copy.filter} data-filters data-reveal="rise">
         {filters.map((f) => (
-          <button type="button" class="chip" data-filter={f} aria-pressed={f === 'all' ? 'true' : 'false'}>{focusLabels[f][lang]}</button>
+          <button type="button" class="chip" data-filter={f} aria-pressed={f === 'all' ? 'true' : 'false'}>{worldLabels[f][lang]}</button>
         ))}
       </div>
       <div class="menu__list" data-reveal="stagger" data-menu-list data-stone-spot="top-right">
-        {massages.map((m) => (
+        {treatments.map((m) => (
           <div id={m.id} class="menu__item" data-reveal-item>
             <MassageCard m={m} lang={lang} />
           </div>
@@ -93,6 +93,7 @@ const filters: (Focus | 'all')[] = ['all', 'relax', 'deep', 'couples'];
     box-shadow: inset 0 0 0 1px var(--line);
     font-weight: 600;
     font-size: 0.95rem;
+    white-space: nowrap;
     cursor: pointer;
     transition: background-color 0.4s var(--ease), color 0.4s var(--ease), box-shadow 0.4s;
   }
@@ -101,8 +102,19 @@ const filters: (Focus | 'all')[] = ['all', 'relax', 'deep', 'couples'];
   .menu__list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
   .menu__item.is-hidden { display: none; }
   .menu__item { scroll-margin-top: calc(var(--header-h) + 24px); }
-  .menu__vat { margin: 28px 0 0; color: var(--muted); font-size: 0.9rem; }
+  .menu__vat { margin: 28px 0 0; max-width: 60em; color: var(--muted); font-size: 0.9rem; }
   .unsure__inner { display: grid; justify-items: center; text-align: center; }
   .unsure .lead { margin: 20px 0 30px; }
   @media (max-width: 1100px) { .menu__list { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) {
+    /* phones: the filters become one swipeable row */
+    .menu__filters {
+      flex-wrap: nowrap;
+      margin-inline: calc(-1 * var(--gutter));
+      padding-inline: var(--gutter);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .menu__filters::-webkit-scrollbar { display: none; }
+  }
 </style>

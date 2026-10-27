@@ -1,6 +1,6 @@
 # Timeless Spa website
 
-Bilingual (German / English) website for Timeless Spa, a massage spa at Melatengürtel 131A, 50825 Köln-Ehrenfeld. German is at `/`, English at `/en/`.
+Bilingual (German / English) website for Timeless Spa, Melatengürtel 131A, 50825 Köln-Ehrenfeld: "Thai Heart. German Quality. Timeless Experience." It is a premium spa joining Thai healing traditions with German quality standards. It offers six experience worlds: Head Spa, Hand & Foot Spa, Signature Massages, Pregnancy Herbal Spa, Timeless Organic Botanicals and the Timeless Spa Academy. German is at `/`, English at `/en/`.
 
 Built with Astro (static HTML). The motion and sound use GSAP + ScrollTrigger, Lenis, Three.js, MapLibre GL and the Web Audio API.
 
@@ -31,8 +31,10 @@ These are placeholders and must be replaced:
 |---|---|
 | Phone, WhatsApp number, email | `src/data/site.ts` |
 | Opening hours | `src/data/site.ts` |
-| Massage menu and prices (sample menu right now) | `src/data/massages.ts`, then set `menuIsSample = false` |
-| Team names and photos, the spa's story | `src/views/About.astro` |
+| Treatment durations and prices (sample prices right now) | `src/data/treatments.ts`, then set `menuIsSample = false` |
+| Academy dates, formats and prices | `src/views/Academy.astro` |
+| Team names and photos | `src/views/About.astro` |
+| Photos for Head Spa, Hand & Foot, Pregnancy, Botanicals and Academy | `src/data/brand.ts`, `src/data/treatments.ts` |
 | Impressum and Datenschutz (operator details, hosting provider, legal review) | `src/views/Legal.astro` |
 | Real domain (and removing the review-only `noindex`) | `astro.config.mjs`, `src/layouts/Base.astro` |
 | Photos (currently Unsplash stock, credited in `CREDITS.md`) | `src/assets/photos/` |
@@ -41,7 +43,12 @@ All copy is a draft for the spa to review.
 
 ## Where things live
 
-- `src/data/` holds the spa's details (`site.ts`) and the massage menu (`massages.ts`).
+- `src/data/` holds:
+  - the spa's details (`site.ts`)
+  - the brand concept (`brand.ts`): claim, philosophy and the six experience worlds
+  - the treatment menu (`treatments.ts`)
+
+  Copy rule from the concept: never write "chemiefrei" / "chemical-free". Use "mit ausgewählten natürlichen Inhaltsstoffen und transparenten Rezepturen" (with selected natural ingredients and transparent recipes).
 - `src/i18n/` holds the interface text (`ui.ts`) and the page URLs in both languages (`routes.ts`).
 - `src/views/` has one file per page, with its German and English copy at the top. `src/pages/` only maps URLs to views.
 - `src/components/` contains the header, footer, booking panel, intro, cards, voucher and map block.

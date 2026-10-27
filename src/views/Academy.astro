@@ -1,0 +1,116 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { site, mailto, whatsappWith, type Lang } from '../data/site';
+import { ui } from '../i18n/ui';
+import photo from '../assets/photos/forearm-massage.jpg';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+
+// Training areas come from the client's concept. Dates, formats, prices and certificates are not known yet.
+const copy = {
+  de: {
+    title: 'Timeless Spa Academy',
+    description: 'Die Timeless Spa Academy in Köln: professionelle Schulungen in Head Spa, Thai-Wellness, Hand- und Fußpflege, Spa-Service, Hygiene und Behandlungsqualität.',
+    eyebrow: 'Timeless Spa Academy',
+    h1: 'Thailändische Kunst, <em>deutsch</em> gelehrt.',
+    lead: 'Professionelle Schulungen für alle, die Spa-Behandlungen auf höchstem Niveau anbieten möchten: mit thailändischer Tradition und deutscher Präzision, Hygiene und Struktur.',
+    photoAlt: 'Hände bei einer Massagetechnik',
+    areasEyebrow: 'Schulungsbereiche',
+    areasTitle: 'Was Sie bei uns <em>lernen</em>.',
+    areas: [
+      ['Head Spa', 'Kopfhaut- und Haarpflegerituale mit thailändischen und deutschen Kräutern.'],
+      ['Thai-Wellness', 'Traditionelle thailändische Behandlungs- und Berührungstechniken.'],
+      ['Hand- & Fußpflege', 'Kräuterbäder, Peelings, Pflege und Massagetechniken für Hände und Füße.'],
+      ['Spa-Service', 'Gastfreundschaft, Achtsamkeit und ein Ablauf, der in Erinnerung bleibt.'],
+      ['Hygiene', 'Strukturierte, nachvollziehbare Hygienestandards für Spa und Produkte.'],
+      ['Behandlungsqualität', 'Präzision und gleichbleibende Qualität in jeder Behandlung.'],
+    ],
+    soon: 'Termine, Formate und Preise der Schulungen folgen in Kürze.',
+    ctaTitle: 'Interesse an einer <em>Schulung</em>?',
+    ctaText: 'Schreiben Sie uns, welche Schulung Sie interessiert. Wir melden uns mit den nächsten Terminen.',
+    whatsappText: 'Hallo Timeless Spa, ich interessiere mich für eine Schulung in der Spa Academy.',
+    emailSubject: 'Spa Academy: Anfrage',
+  },
+  en: {
+    title: 'Timeless Spa Academy',
+    description: 'The Timeless Spa Academy in Cologne: professional training in Head Spa, Thai wellness, hand and foot care, spa service, hygiene and treatment quality.',
+    eyebrow: 'Timeless Spa Academy',
+    h1: 'Thai artistry, taught with <em>German</em> care.',
+    lead: 'Professional training for everyone who wants to offer spa treatments at the highest level: Thai tradition with German precision, hygiene and structure.',
+    photoAlt: 'Hands practising a massage technique',
+    areasEyebrow: 'Training areas',
+    areasTitle: 'What you will <em>learn</em>.',
+    areas: [
+      ['Head Spa', 'Scalp and hair rituals with Thai and German herbs.'],
+      ['Thai wellness', 'Traditional Thai treatment and touch techniques.'],
+      ['Hand & foot care', 'Herbal baths, scrubs, care and massage techniques for hands and feet.'],
+      ['Spa service', 'Hospitality, mindfulness and a visit people remember.'],
+      ['Hygiene', 'Structured, traceable hygiene standards for the spa and its products.'],
+      ['Treatment quality', 'Precision and consistent quality in every treatment.'],
+    ],
+    soon: 'Dates, formats and prices for the courses will follow soon.',
+    ctaTitle: 'Interested in a <em>course</em>?',
+    ctaText: 'Tell us which course interests you and we will get back to you with the next dates.',
+    whatsappText: 'Hello Timeless Spa, I am interested in a course at the Spa Academy.',
+    emailSubject: 'Spa Academy enquiry',
+  },
+}[lang];
+---
+<Base lang={lang} page="academy" title={copy.title} description={copy.description}>
+  <PageHero eyebrow={copy.eyebrow} title={copy.h1} lead={copy.lead} photo={photo} photoAlt={copy.photoAlt} />
+
+  <section class="section section--linen areas">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal="rise">{copy.areasEyebrow}</p>
+        <h2 data-reveal="words" set:html={copy.areasTitle} />
+      </div>
+      <ol class="areas__list" data-reveal="stagger" data-stone-spot="top-right">
+        {copy.areas.map(([title, text], i) => (
+          <li data-reveal-item data-stone-hover>
+            <span class="areas__num">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </li>
+        ))}
+      </ol>
+      <p class="areas__soon" role="note">{copy.soon}</p>
+    </div>
+  </section>
+
+  <section class="section academy-cta">
+    <div class="wrap academy-cta__inner">
+      <h2 data-reveal="words" set:html={copy.ctaTitle} />
+      <p class="lead" data-reveal="rise">{copy.ctaText}</p>
+      <div class="academy-cta__options" data-reveal="rise">
+        <a class="btn" href={whatsappWith(copy.whatsappText)} target="_blank" rel="noopener" data-sfx="bowl"><Icon name="whatsapp" />WhatsApp</a>
+        <a class="btn btn--ghost" href={mailto(copy.emailSubject)} data-sfx="bowl"><Icon name="mail" />{t.booking.email}</a>
+        <a class="btn btn--ghost" href={site.phone.href} data-sfx="bowl"><Icon name="phone" />{t.booking.call}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .areas__list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 0; padding: 0; list-style: none; }
+  .areas__list li {
+    padding: 30px;
+    border-radius: var(--radius);
+    background: var(--sand);
+    transition: transform 0.7s var(--ease), background-color 0.5s;
+  }
+  .areas__list li:hover { transform: translateY(-4px); background: var(--sand-2); }
+  .areas__num { display: block; margin-bottom: 22px; font-family: var(--serif); font-style: italic; font-size: 2.4rem; font-weight: 300; line-height: 1; color: var(--clay); }
+  .areas__list h3 { margin-bottom: 10px; }
+  .areas__list p { margin: 0; color: var(--muted); }
+  .areas__soon { margin: 30px 0 0; color: var(--muted); font-size: 0.93rem; }
+  .academy-cta__inner { display: grid; justify-items: center; text-align: center; }
+  .academy-cta .lead { margin: 22px 0 32px; }
+  .academy-cta__options { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  @media (max-width: 900px) { .areas__list { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .areas__list { grid-template-columns: 1fr; } }
+</style>
