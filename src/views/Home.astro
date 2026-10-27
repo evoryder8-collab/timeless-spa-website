@@ -112,7 +112,7 @@ const worldHref = (w: (typeof experienceWorlds)[number]) => href(w.page, lang) +
     </div>
   </section>
 
-  <section class="section philosophy">
+  <section class="section philosophy" data-dust>
     <div class="wrap">
       <p class="eyebrow" data-reveal="rise">{copy.philEyebrow}</p>
       <h2 class="philosophy__claim" data-reveal="words" set:html={brand.claim[lang]} />
@@ -156,7 +156,7 @@ const worldHref = (w: (typeof experienceWorlds)[number]) => href(w.page, lang) +
     </div>
   </section>
 
-  <section class="section section--dark gift">
+  <section class="section section--dark gift" data-dust>
     <div class="wrap gift__grid">
       <div>
         <p class="eyebrow" data-reveal="rise">{copy.voucherEyebrow}</p>
@@ -248,6 +248,8 @@ const worldHref = (w: (typeof experienceWorlds)[number]) => href(w.page, lang) +
   .hero h1, .hero .eyebrow, .hero .lead {
     text-shadow: 0 0 2px rgb(244 234 220 / 0.9), 0 0 18px rgb(244 234 220 / 0.85), 0 0 44px rgb(244 234 220 / 0.7);
   }
+  .hero h1 :global(em), .hero h1 :global(em .w) { text-shadow: none; }
+  .hero h1 :global(em .w) { filter: drop-shadow(0 0 10px rgb(244 234 220 / 0.85)) drop-shadow(0 0 26px rgb(244 234 220 / 0.6)); }
   .hero .lead { margin-top: 26px; max-width: 26em; color: var(--espresso-2); }
   .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
   .hero__touch {
@@ -378,7 +380,6 @@ const worldHref = (w: (typeof experienceWorlds)[number]) => href(w.page, lang) +
   .philosophy { background: var(--aubergine); color: rgb(246 241 234 / 0.82); }
   .philosophy .eyebrow { color: var(--gold); }
   .philosophy__claim { max-width: 15ch; color: var(--gold); font-size: clamp(2.3rem, 5vw, 4.4rem); }
-  .philosophy__claim :global(em) { color: var(--linen); }
   .philosophy__pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 4vw, 56px); margin: clamp(48px, 7vw, 90px) 0 0; padding: 0; list-style: none; }
   .philosophy__pillars li { padding-top: 26px; border-top: 1px solid rgb(201 178 127 / 0.35); }
   .philosophy__num { display: block; margin-bottom: 22px; font-family: var(--serif); font-style: italic; font-size: 2.6rem; font-weight: 300; line-height: 1; color: var(--gold); }

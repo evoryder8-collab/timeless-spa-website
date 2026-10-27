@@ -62,6 +62,7 @@ document.addEventListener('astro:page-load', async () => {
   }
   if (document.querySelector('[data-voucher]') && !reduced) lazy(import('./voucher'), (m) => m.startVouchers());
   if (document.querySelector('[data-map]')) lazy(import('./map'), (m) => m.startMap());
+  lazy(import('./life'), (m) => m.startLife());
 
   const id = pageId;
   if (document.documentElement.classList.contains('show-intro') || introRunning()) {

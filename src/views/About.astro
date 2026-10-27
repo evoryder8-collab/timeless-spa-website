@@ -85,7 +85,7 @@ const copy = {
     </div>
   </section>
 
-  <section class="section philosophy">
+  <section class="section philosophy" data-dust>
     <div class="wrap">
       <p class="eyebrow" data-reveal="rise">{copy.philEyebrow}</p>
       <h2 class="philosophy__claim" data-reveal="words" set:html={brand.claim[lang]} />
@@ -151,7 +151,6 @@ const copy = {
   .philosophy { background: var(--aubergine); color: rgb(246 241 234 / 0.82); }
   .philosophy .eyebrow { color: var(--gold); }
   .philosophy__claim { max-width: 15ch; color: var(--gold); font-size: clamp(2.3rem, 5vw, 4.4rem); }
-  .philosophy__claim :global(em) { color: var(--linen); }
   .philosophy__pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 4vw, 56px); margin: clamp(48px, 7vw, 90px) 0 0; padding: 0; list-style: none; }
   .philosophy__pillars li { padding-top: 26px; border-top: 1px solid rgb(201 178 127 / 0.35); }
   .philosophy__num { display: block; margin-bottom: 22px; font-family: var(--serif); font-style: italic; font-size: 2.6rem; font-weight: 300; line-height: 1; color: var(--gold); }

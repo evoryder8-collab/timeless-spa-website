@@ -10,7 +10,7 @@ const { lang } = Astro.props;
 const t = ui[lang];
 const year = new Date().getFullYear();
 ---
-<footer class="site-footer">
+<footer class="site-footer" data-dust>
   <div class="wrap site-footer__grid">
     <div class="site-footer__brand">
       <Logo />
@@ -58,6 +58,22 @@ const year = new Date().getFullYear();
     --logo-accent: var(--clay-soft);
   }
   .site-footer :global(.logo) { color: var(--sand); }
+  .site-footer :global(.logo__mark) { animation: mark-breathe 8s ease-in-out infinite; transform-origin: 50% 80%; }
+  @keyframes mark-breathe { 0%, 100% { transform: scale(0.96); filter: drop-shadow(0 0 0 rgb(217 164 127 / 0)); } 50% { transform: scale(1.04); filter: drop-shadow(0 0 10px rgb(217 164 127 / 0.55)); } }
+  .site-footer::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(217 164 127 / 0.9), transparent);
+    background-size: 40% 100%;
+    background-repeat: no-repeat;
+    animation: edge-light 7s ease-in-out infinite;
+  }
+  @keyframes edge-light { from { background-position: -40% 0; } to { background-position: 140% 0; } }
+  .site-footer > .wrap { position: relative; z-index: 1; }
   .site-footer__grid {
     display: grid;
     grid-template-columns: 1.4fr 1fr 1.1fr 1.3fr;

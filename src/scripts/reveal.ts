@@ -36,6 +36,8 @@ function splitWords(el: HTMLElement) {
   walk(el);
 }
 
+const reducedDepth = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function play(el: HTMLElement) {
   const kind = el.dataset.reveal;
   el.classList.add('is-in');
@@ -50,7 +52,8 @@ function play(el: HTMLElement) {
     el.append(ring);
     const tl = gsap.timeline({ onComplete: () => { ring.remove(); el.style.clipPath = ''; } });
     tl.fromTo(el, { clipPath: 'circle(0% at 50% 55%)' }, { clipPath: 'circle(75% at 50% 50%)', duration: 1.9, ease: 'power3.inOut' }, 0);
-    if (img) tl.fromTo(img, { scale: 1.25 }, { scale: 1, duration: 2.4, ease: 'power3.out', clearProps: 'transform' }, 0);
+    // settles at the slight extra scale src/scripts/life.ts uses for scroll depth
+    if (img) tl.fromTo(img, { scale: 1.34 }, { scale: reducedDepth ? 1 : 1.14, duration: 2.4, ease: 'power3.out' }, 0);
     tl.fromTo(ring, { scale: 0, opacity: 1 }, { scale: 3.4, opacity: 0, duration: 1.8, ease: 'power2.out' }, 0.15);
     sound.drip(0.35);
   } else {
